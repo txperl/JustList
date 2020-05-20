@@ -1,0 +1,616 @@
+<!--
+    Using JustList.
+    GitHub: https://github.com/txperl/JustList
+-->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustList</title>
+
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.css">
+    <style>
+        .mdui-typo img {
+            width: auto;
+            max-height: 600px;
+            margin: 0 auto;
+        }
+
+        img {
+            border-radius: 10px;
+        }
+
+        video,
+        audio {
+            width: 100%;
+        }
+
+        img:focus,
+        video:focus,
+        audio:focus {
+            outline: none;
+        }
+
+        .text-item {
+            border: 2px solid rgba(0, 0, 0, .12) !important;
+            border-radius: 10px;
+            padding: 2em;
+        }
+
+        .mdui-card {
+            box-shadow: none;
+        }
+
+        .mdui-list-item,
+        .mdui-list-item:hover {
+            border-radius: 20px;
+        }
+
+        .mdui-textfield-input {
+            border-bottom: none;
+        }
+
+        .mdui-textfield-focus .mdui-icon,
+        .mdui-textfield-focus .mdui-textfield-label {
+            color: rgba(0, 0, 0, .54);
+        }
+
+        .mdui-textfield-focus .mdui-textfield-input,
+        .mdui-textfield-focus .mdui-textfield-input:hover {
+            border-bottom: none;
+            box-shadow: none;
+        }
+
+        .mdui-textfield-input:not([disabled]):hover {
+            border-bottom: none;
+            box-shadow: none;
+        }
+
+        #loading {
+            width: 100%;
+            height: 100%;
+        }
+
+        #loading img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            -webkit-transform: translateY(-50%) translateX(-50%);
+            transform: translateY(-50%) translateX(-50%);
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body class="mdui-appbar-with-toolbar">
+    <div id="loading">
+        <img src="data:image/svg+xml;base64,PCEtLSBCeSBTYW0gSGVyYmVydCAoQHNoZXJiKSwgZm9yIGV2ZXJ5b25lLiBNb3JlIEAgaHR0cDovL2dvby5nbC83QUp6YkwgLS0+Cjxzdmcgd2lkdGg9IjE0MCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDE0MCA2NCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJwaW5rIj4KICAgIDxwYXRoIGQ9Ik0zMC4yNjIgNTcuMDJMNy4xOTUgNDAuNzIzYy01Ljg0LTMuOTc2LTcuNTYtMTIuMDYtMy44NDItMTguMDYzIDMuNzE1LTYgMTEuNDY3LTcuNjUgMTcuMzA2LTMuNjhsNC41MiAzLjc2IDIuNi01LjI3NGMzLjcxNy02LjAwMiAxMS40Ny03LjY1IDE3LjMwNS0zLjY4IDUuODQgMy45NyA3LjU2IDEyLjA1NCAzLjg0MiAxOC4wNjJMMzQuNDkgNTYuMTE4Yy0uODk3IDEuNTEyLTIuNzkzIDEuOTE1LTQuMjI4Ljl6IiBmaWxsLW9wYWNpdHk9Ii41Ij4KICAgICAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJmaWxsLW9wYWNpdHkiCiAgICAgICAgICAgICBiZWdpbj0iMHMiIGR1cj0iMS40cyIKICAgICAgICAgICAgIHZhbHVlcz0iMC41OzE7MC41IgogICAgICAgICAgICAgY2FsY01vZGU9ImxpbmVhciIKICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTEwNS41MTIgNTYuMTJsLTE0LjQ0LTI0LjI3MmMtMy43MTYtNi4wMDgtMS45OTYtMTQuMDkzIDMuODQzLTE4LjA2MiA1LjgzNS0zLjk3IDEzLjU4OC0yLjMyMiAxNy4zMDYgMy42OGwyLjYgNS4yNzQgNC41Mi0zLjc2YzUuODQtMy45NyAxMy41OTItMi4zMiAxNy4zMDcgMy42OCAzLjcxOCA2LjAwMyAxLjk5OCAxNC4wODgtMy44NDIgMTguMDY0TDEwOS43NCA1Ny4wMmMtMS40MzQgMS4wMTQtMy4zMy42MS00LjIyOC0uOXoiIGZpbGwtb3BhY2l0eT0iLjUiPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9ImZpbGwtb3BhY2l0eSIKICAgICAgICAgICAgIGJlZ2luPSIwLjdzIiBkdXI9IjEuNHMiCiAgICAgICAgICAgICB2YWx1ZXM9IjAuNTsxOzAuNSIKICAgICAgICAgICAgIGNhbGNNb2RlPSJsaW5lYXIiCiAgICAgICAgICAgICByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICAgIDwvcGF0aD4KICAgIDxwYXRoIGQ9Ik02Ny40MDggNTcuODM0bC0yMy4wMS0yNC45OGMtNS44NjQtNi4xNS01Ljg2NC0xNi4xMDggMC0yMi4yNDggNS44Ni02LjE0IDE1LjM3LTYuMTQgMjEuMjM0IDBMNzAgMTYuMTY4bDQuMzY4LTUuNTYyYzUuODYzLTYuMTQgMTUuMzc1LTYuMTQgMjEuMjM1IDAgNS44NjMgNi4xNCA1Ljg2MyAxNi4wOTggMCAyMi4yNDdsLTIzLjAwNyAyNC45OGMtMS40MyAxLjU1Ni0zLjc1NyAxLjU1Ni01LjE4OCAweiIgLz4KPC9zdmc+Cg=="
+            alt="loading" />
+    </div>
+    <div id="main-part" style="display: none;">
+        <div id="file-list" class="mdui-container" style="margin-top: 20px; margin-bottom: 30px;">
+            <div class="mdui-card">
+                <!-- 卡片的内容 -->
+                <div class="mdui-card-content">
+                    <!-- 头 -->
+                    <div style="padding: 8px 5px 12px 5px;">
+                        <!-- 用户选择菜单 -->
+                        <ul class="mdui-menu" id="choose_user">
+                            <li v-for="x in more.users" class="mdui-menu-item">
+                                <a v-on:click="go_hash('/list/' + x + '/-11'); change_type('list')"
+                                    class="mdui-ripple">[[ x
+                                    ]]</a>
+                            </li>
+                            <li class="mdui-menu-item">
+                                <a target="_blank" href="https://github.com/txperl/JustList" class="mdui-ripple">GitHub@JustList</a>
+                            </li>
+                        </ul>
+                        <!-- 用户选择器 -->
+                        <div class="mdui-chip" mdui-menu="{target: '#choose_user', subMenuTrigger: 'hover'}">
+                            <span class="mdui-chip-icon" mdui-tooltip="{content: '用户切换', position: 'top'}">
+                                <i class="mdui-icon material-icons">face</i>
+                            </span>
+                        </div>
+                        <!-- 首页头按钮 -->
+                        <div v-on:click="go_hash('/list/' + more._u + '/-11'); change_type('list')" class="mdui-chip"
+                            style="margin: 2px 0 2px -32px; text-align: right;">
+                            <span v-if="more._t != 'search'" style="margin-left:25px;" class="mdui-chip-title">[[
+                                more._u ]]
+                                ~</span>
+                            <span v-if="more._t == 'search'" style="margin-left:25px;"
+                                class="mdui-chip-title">退出搜索</span>
+                        </div>
+                        <!-- 搜索头按钮 -->
+                        <div v-if="more._t == 'search'" v-on:click="go_hash('/search/' + encodeURI(more._s))"
+                            class="mdui-chip" style=" text-align: right;">
+                            <span class="mdui-chip-title">「[[ more._s ]]」~</span>
+                        </div>
+                        <!-- 路径 -->
+                        <span v-for="x in paths" v-if="x.id != -11">
+                            <span style="color:rgba(0,0,0,.87);">
+                                &nbsp;&gt;&nbsp;
+                            </span>
+                            <div v-on:click="go_hash('/list/' + more._u + '/' + x.id)" class="mdui-chip">
+                                <span class="mdui-chip-title">[[ x.name ]]</span>
+                            </div>
+                        </span>
+                    </div>
+
+                    <ul class="mdui-list">
+                        <!-- 功能按键 -->
+                        <li class="mdui-list-item">
+                            <div class="mdui-list-item-content">
+                                <div class="mdui-list-item-title">
+                                    <!-- 搜索 -->
+                                    <div class="mdui-textfield mdui-textfield-expandable mdui-float-right">
+                                        <button class="mdui-textfield-icon mdui-btn mdui-btn-icon"><i
+                                                class="mdui-icon material-icons">search</i></button>
+                                        <input v-model="more._s"
+                                            v-on:keyup="go_hash('/search/' + encodeURI(more._s.replace('/','')))"
+                                            class="mdui-textfield-input" type="text"
+                                            placeholder="请输入想要搜索的关键词（支持正则表达式）" />
+                                        <button v-on:click="change_type('list')"
+                                            class="mdui-textfield-close mdui-btn mdui-btn-icon"
+                                            mdui-tooltip="{content: '退出搜索'}">
+                                            <i class="mdui-icon material-icons">close</i>
+                                        </button>
+                                    </div>
+                                    <!-- 返回 -->
+                                    <button v-on:click="go_back(1)" class="mdui-btn mdui-btn-icon"><i
+                                            class="mdui-icon material-icons">arrow_back</i></button>
+                                    <!-- 刷新 -->
+                                    <button v-on:click="refresh()" class="mdui-btn mdui-btn-icon"
+                                        mdui-tooltip="{content: '刷新本地缓存'}"><i
+                                            class="mdui-icon material-icons">refresh</i></button>
+                                    <!-- 图片浏览模式 -->
+                                    <button v-on:click="show('img', '#list_imgs')" class="mdui-btn mdui-btn-icon"
+                                        mdui-tooltip="{content: '浏览本页所有图片'}"><i
+                                            class="mdui-icon material-icons">panorama_wide_angle</i></button>
+                                    <!-- 下一项 -->
+                                    <button v-if="more._f.next != ''"
+                                        v-on:click="go_hash('/list/' + more._u + '/' + more._f.next)"
+                                        class="mdui-btn mdui-btn-icon"><i
+                                            class="mdui-icon material-icons">keyboard_arrow_down</i></button>
+                                    <!-- 上一项 -->
+                                    <button v-if="more._f.prev != ''"
+                                        v-on:click="go_hash('/list/' + more._u + '/' + more._f.prev)"
+                                        class="mdui-btn mdui-btn-icon"><i
+                                            class="mdui-icon material-icons">keyboard_arrow_up</i></button>
+                                </div>
+                            </div>
+                        </li>
+                        <!-- 文件列表 -->
+                        <li v-for="file in sort_array(files)"
+                            v-on:click="go_click_hash($event, '/list/' + file.user + '/' + file.fileId)"
+                            class="mdui-list-item mdui-ripple">
+                            <div class="mdui-list-item-content">
+                                <div class="mdui-list-item-title">
+                                    <i v-if="in_support(file)" class="mdui-icon material-icons"
+                                        style="margin: -3px 5px 0 0;">[[in_support(file)]]</i> [[file.fileName ]]
+                                    <span v-if="more._t == 'search'" style="color: rgba(0, 0, 0, 0.5);
+                                font-size: 12px;"> @[[ file.user ]]</span>
+                                    <!-- 下载按钮 -->
+                                    <i v-if="file.isFolder == false"
+                                        v-on:click="go('/file/' + file.user + '/?id=' + file.fileId, true)"
+                                        class="mdui-float-right mdui-icon material-icons"
+                                        style="color: rgba(0,0,0,.54);">file_download</i>
+                                </div>
+                                <div v-if="file.isFolder == false" class="mdui-list-item-text"
+                                    :class="{'mdui-list-item-one-line': more._t != 'search', 'mdui-list-item-two-line': more._t == 'search'}">
+                                    [[ file.fileSize ]] / [[ file.lastOpTime ]]
+                                    <span v-if="more._t == 'search'" style="font-weight: 600;"><br>[[ file.filePath
+                                        ]]</span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    <!-- 固定标签 -->
+                    <div v-if="more._f.isFolder == false" class="mdui-typo">
+                        <blockquote>
+                            名称：[[ more._f.fileName ]]<br>
+                            大小：[[ more._f.fileSize ]]<br>
+                            日期：[[ more._f.lastOpTime ]]<br>
+                            用户：[[ more._f.user ]]<br>
+                            链接：
+                            <ul>
+                                <li><a :href="api_url+ '/file/' + more._u + '/?id=' + more._f.fileId">[[
+                                        api_url]]/file/[[ more._u ]]/?id=[[ more._f.fileId ]]</a></li>
+                                <li><a :href="api_url+'/file/' + more._u + get_full_path(paths)">[[
+                                        api_url]]/file/[[ more._u ]][[get_full_path(paths)]]</a></li>
+                            </ul>
+                        </blockquote>
+                        <br>
+                    </div>
+                    <!-- 卡片的媒体内容 -->
+                    <div v-if="more._f.isFolder == false" class="mdui-card-media" style="margin: 8px -16px;">
+                        <div class="mdui-typo">
+                            <!-- 图片 -->
+                            <img v-viewer="{navbar: false}" v-if="in_support(more._f, 'img')"
+                                v-lazy="api_url + '/file/' + more._u + '/?id=' + more._f.fileId" />
+                            <!-- 视频 -->
+                            <video v-else-if="in_support(more._f, 'video')"
+                                :src="api_url + '/file/' + more._u + '/?id=' + more._f.fileId"
+                                controls="controls"></video>
+                            <!-- 音频 -->
+                            <audio v-else-if="in_support(more._f, 'audio')"
+                                :src="api_url + '/file/' + more._u + '/?id=' + more._f.fileId"
+                                controls="controls"></audio>
+                            <!-- 文本 -->
+                            <textarea v-else-if="in_support(more._f, 'text') && more._f.fileType !='md'"
+                                :value="more._f.data" class="mdui-textfield-input text-item" rows="12"
+                                readonly></textarea>
+                            <!-- markdown -->
+                            <vue-markdown v-else-if="more._f.fileType == 'md'" :source="more._f.data" class="text-item">
+                            </vue-markdown>
+                        </div>
+                    </div>
+                    <div id="list_imgs" class="images" v-viewer="{url: 'data-source'}">
+                        <img v-for="file in files" v-if="in_support(file, 'img')"
+                            :data-source="api_url + '/file/' + more._u + '/?id=' + file.fileId">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+<footer>
+    <script src="//cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/axios@0.19.2/dist/axios.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/vue-markdown@2.2.4/dist/vue-markdown.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/vue-lazyload@1.3.3/vue-lazyload.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/v-viewer@1.5.1/dist/v-viewer.min.js"></script>
+    <script>
+        version = 2020052001;
+        tmp = {}; // 全局暂留
+
+        Vue.use(VueLazyload, {
+            preLoad: 1.3,
+            loading: 'data:image/svg+xml;base64,PCEtLSBCeSBTYW0gSGVyYmVydCAoQHNoZXJiKSwgZm9yIGV2ZXJ5b25lLiBNb3JlIEAgaHR0cDovL2dvby5nbC83QUp6YkwgLS0+Cjxzdmcgd2lkdGg9IjEyMCIgaGVpZ2h0PSIzMCIgdmlld0JveD0iMCAwIDEyMCAzMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJwaW5rIj4KICAgIDxjaXJjbGUgY3g9IjE1IiBjeT0iMTUiIHI9IjE1Ij4KICAgICAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJyIiBmcm9tPSIxNSIgdG89IjE1IgogICAgICAgICAgICAgICAgIGJlZ2luPSIwcyIgZHVyPSIwLjhzIgogICAgICAgICAgICAgICAgIHZhbHVlcz0iMTU7OTsxNSIgY2FsY01vZGU9ImxpbmVhciIKICAgICAgICAgICAgICAgICByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICAgICAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJmaWxsLW9wYWNpdHkiIGZyb209IjEiIHRvPSIxIgogICAgICAgICAgICAgICAgIGJlZ2luPSIwcyIgZHVyPSIwLjhzIgogICAgICAgICAgICAgICAgIHZhbHVlcz0iMTsuNTsxIiBjYWxjTW9kZT0ibGluZWFyIgogICAgICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9jaXJjbGU+CiAgICA8Y2lyY2xlIGN4PSI2MCIgY3k9IjE1IiByPSI5IiBmaWxsLW9wYWNpdHk9IjAuMyI+CiAgICAgICAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0iciIgZnJvbT0iOSIgdG89IjkiCiAgICAgICAgICAgICAgICAgYmVnaW49IjBzIiBkdXI9IjAuOHMiCiAgICAgICAgICAgICAgICAgdmFsdWVzPSI5OzE1OzkiIGNhbGNNb2RlPSJsaW5lYXIiCiAgICAgICAgICAgICAgICAgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICAgICAgPGFuaW1hdGUgYXR0cmlidXRlTmFtZT0iZmlsbC1vcGFjaXR5IiBmcm9tPSIwLjUiIHRvPSIwLjUiCiAgICAgICAgICAgICAgICAgYmVnaW49IjBzIiBkdXI9IjAuOHMiCiAgICAgICAgICAgICAgICAgdmFsdWVzPSIuNTsxOy41IiBjYWxjTW9kZT0ibGluZWFyIgogICAgICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9jaXJjbGU+CiAgICA8Y2lyY2xlIGN4PSIxMDUiIGN5PSIxNSIgcj0iMTUiPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9InIiIGZyb209IjE1IiB0bz0iMTUiCiAgICAgICAgICAgICAgICAgYmVnaW49IjBzIiBkdXI9IjAuOHMiCiAgICAgICAgICAgICAgICAgdmFsdWVzPSIxNTs5OzE1IiBjYWxjTW9kZT0ibGluZWFyIgogICAgICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9ImZpbGwtb3BhY2l0eSIgZnJvbT0iMSIgdG89IjEiCiAgICAgICAgICAgICAgICAgYmVnaW49IjBzIiBkdXI9IjAuOHMiCiAgICAgICAgICAgICAgICAgdmFsdWVzPSIxOy41OzEiIGNhbGNNb2RlPSJsaW5lYXIiCiAgICAgICAgICAgICAgICAgcmVwZWF0Q291bnQ9ImluZGVmaW5pdGUiIC8+CiAgICA8L2NpcmNsZT4KPC9zdmc+Cg==',
+            attempt: 2
+        });
+        Vue.use(VueMarkdown);
+        Vue.use(VueViewer.default);
+        app = new Vue({
+            el: '#file-list',
+            data: {
+                paths: [{ id: -11, name: "~" }],
+                files: [],
+                temp: {
+                    _f: { "fileSize": 0, "isFolder": true, "data": "", "next": "", "prev": "" }
+                },
+                more: {
+                    _u: "", // 当前用户
+                    _f: "", // 当前路径信息
+                    _t: "list", // 当前操作类型
+                    _s: "", // 当前搜索关键词
+                    _tmp: "", // 保留关键词
+                    users: [], // 全部用户
+                    format_support: { // 格式支持，index=0 为显示的图标，其余为相应的文件后缀
+                        "file": ["folder_open"],
+                        "video": ["ondemand_video", "mp4", "mkv", "wmv", "avi", "mov", , "webm"],
+                        "img": ["image", "bmp", "jpg", "jpeg", "png", "gif", "webp"],
+                        "audio": ["audiotrack", "mp3", "aac"],
+                        "text": ["description", "md", "txt", "json"],
+                        "archive": ["archive", "zip"],
+                    }
+                },
+                file_list_data: {},
+                root_url: window.location.protocol + '//' + window.location.host, // 前端域
+                api_url: window.location.protocol + '//' + window.location.host // 后端域
+            },
+            created: function () {
+                // 初始化数据获取
+                var data = localStorage.getItem("cloud_list");
+                var outdated = localStorage.getItem("cloud_outdated");
+                var tmpversion = localStorage.getItem("cloud_version");
+                if (data == null || outdated == null || tmpversion == null || tmpversion < version || outdated <= Date.parse(new Date())) {
+                    var vm = this;
+                    axios.get(this.api_url + "/api/get/list")
+                        .then(function (rep) {
+                            localStorage.setItem('cloud_list', JSON.stringify(rep["data"]));
+                            localStorage.setItem('cloud_outdated', Date.parse(new Date()) + 600000);
+                            localStorage.setItem('cloud_version', version);
+                            data = localStorage.getItem("cloud_list");
+                            vm.load_data(vm, data);
+                            vm.toPath(window.location.hash);
+                            $("#loading").fadeOut();
+                            $("#main-part").fadeIn();
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            mdui.snackbar({
+                                message: ': ( 数据获取失败...刷新页面或点击按钮以重试',
+                                buttonText: '重试',
+                                timeout: 0,
+                                onButtonClick: function () {
+                                    window.location.reload();
+                                }
+                            });
+                        });
+                } else {
+                    this.load_data(this, data);
+                    this.toPath(window.location.hash);
+                    $("#loading").fadeOut();
+                    $("#main-part").fadeIn();
+                }
+            },
+            delimiters: ['[[', ']]'],
+            methods: {
+                load_data: function (vm, data) {
+                    // 加载数据
+                    try {
+                        data = jQuery.parseJSON(data);
+                        if (data["code"] != 1 || Object.keys(data["msg"]).length == 0)
+                            throw new Error();
+                    } catch (e) {
+                        console.log(e);
+                        mdui.snackbar({
+                            message: ': (( 初始化失败...点击按钮以重试',
+                            buttonText: '重试',
+                            timeout: 0,
+                            onButtonClick: function () {
+                                localStorage.clear();
+                                window.location.reload();
+                            }
+                        });
+                    }
+                    vm.file_list_data = data["msg"];
+                    vm.more._u = Object.keys(data["msg"])[0];
+                    vm.more.users = Object.keys(data["msg"]);
+                },
+                go_click_hash: function (event, hash) {
+                    if (event.target.className != "mdui-float-right mdui-icon material-icons") {
+                        this.go_hash(hash);
+                    }
+                },
+                go_hash: function (url) {
+                    window.location.hash = url;
+                    this.toPath(url);
+                },
+                go_back: function (step) {
+                    if (this.paths.length <= 1) {
+                        this.go_hash("/list/" + this.more._u + "/-11");
+                        return;
+                    }
+                    for (let i = this.paths.length - 1; i >= 0; i--) {
+                        if (i == Number(this.paths.length) - 1 - step) {
+                            this.go_hash("/list/" + this.more._u + "/" + String(this.paths[i].id));
+                            break;
+                        }
+                    }
+                },
+                go: function (url, isapi = false) {
+                    if (isapi) {
+                        window.location.href = this.api_url + url;
+                    } else {
+                        window.location.href = this.root_url + url;
+                    }
+                },
+                get_full_path: function (paths) {
+                    r = "/";
+                    for (x of paths) {
+                        if (x.id != -11) {
+                            r = r + x.name + "/";
+                        }
+                    }
+                    return r.substring(0, r.length - 1);
+                },
+                get_nexAndPrv: function (user, nowid) {
+                    if (this.paths.length > 1) {
+                        for (let i = this.paths.length - 1; i >= 0; i--) {
+                            if (i == Number(this.paths.length) - 2) {
+                                var toid = this.paths[i].id;
+                                var data = this.locate_id(user, toid);
+                                if (data.end != null) {
+                                    for (let j = 0; j < data.end.child.length; j++) {
+                                        if (data.end.child[j].fileId == nowid) {
+                                            var pre = (j != 0) ? data.end.child[j - 1].fileId : "";
+                                            var nex = (j != data.end.child.length - 1) ? data.end.child[j + 1].fileId : "";
+                                            return [pre, nex];
+                                        }
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    return ["", ""];
+                },
+                show: function (type, id) {
+                    if (type == 'img') {
+                        if ($(id + ' img').length > 0) {
+                            $(id)[0].$viewer.reset()
+                            $(id)[0].$viewer.show()
+                            $(id)[0].$viewer.view(0)
+                        }
+                    }
+                },
+                refresh: function () {
+                    localStorage.clear();
+                    window.location.reload();
+                },
+                change_type: function (c) {
+                    this.more._t = c;
+                    if (c == 'list') {
+                        $(".mdui-textfield").removeClass("mdui-textfield-expanded")
+                        this.more._s = "";
+                    }
+                },
+                in_support: function (file, type = 0) {
+                    var format = file.fileType;
+                    var arr = this.more.format_support;
+                    if (format != null)
+                        format = format.toLowerCase()
+                    if (type != 0) {
+                        return (arr[type].indexOf(format) != -1);
+                    } else {
+                        if (file.isFolder)
+                            return this.more.format_support['file'][0];
+                        for (let t of Object.keys(arr)) {
+                            if (arr[t].indexOf(format) != -1) {
+                                return this.more.format_support[t][0];
+                            }
+                        }
+                        return false;
+                    }
+                },
+                sort_array: function (arr) {
+                    function func(a, b) {
+                        if (a.isFolder || b.isFolder) return 0;
+                        var x1 = a.fileName;
+                        var x2 = b.fileName;
+                        if (x1 < x2) return -1;
+                        if (x1 > x2) return 1;
+                        return 0;
+                    }
+                    var r = {};
+                    try {
+                        r = arr.slice().sort(func);
+                    } catch (e) {
+                        console.log(e);
+                        r = { "Error": [] };
+                    }
+                    return r;
+                },
+                toPath: function (path) {
+                    this.more._f = this.temp._f;
+                    paths = path.split('/');
+                    // /#/type/user/id
+                    // type: list, file
+                    // user: of users
+                    // id: file id
+                    if (paths.length == 4) {
+                        var type = paths[1];
+                        var user = paths[2];
+                        var id = paths[3];
+
+                        if (id == -11) {
+                            this.paths = [{ id: -11, name: "~" }];
+                            this.files = this.file_list_data[user];
+                            // this.more._f = this.temp._f;
+                            this.more._u = user;
+                            return;
+                        }
+
+                        may = this.locate_id(user, id);
+                        if (may.end != null) {
+                            if (type == 'list') {
+                                this.paths = may.process;
+                                this.files = may.end.child;
+                                this.more._u = user;
+                                this.more._f = may.end;
+                                var onetwo = this.get_nexAndPrv(user, id);
+                                this.$set(this.more._f, "prev", onetwo[0]);
+                                this.$set(this.more._f, "next", onetwo[1]);
+                            } else if (type == 'file') {
+                                window.location.href = this.api_url + '/file/' + user + '/?id=' + id;
+                                this.paths = [{ id: -11, name: "~" }];
+                                this.files = this.file_list_data[user];
+                                // this.more._f = this.temp._f;
+                            }
+                        } else {
+                            window.location.href = this.root_url;
+                        }
+                        // /#/type/key
+                        // type: search
+                        // key: keyword
+                    } else if (paths.length == 3) {
+                        var type = paths[1];
+                        var key = decodeURI(paths[2]);
+                        may = this.search(key);
+                        if (may) {
+                            this.paths = may.process;
+                            this.files = may.end;
+                            this.more._s = key;
+                            // this.more._f = this.temp._f;
+                        }
+                    } else {
+                        this.paths = [{ id: -11, name: "~" }];
+                        this.files = this.file_list_data[this.more._u];
+                        // this.more._f = this.temp._f;
+                    }
+
+                    // 加载 more._f 的文件内容（如果有）
+                    if (!this.more._f["isFolder"] && this.more.format_support.text.indexOf(this.more._f["fileType"]) != -1) {
+                        var key = "cache_text_" + String(this.more._f["fileId"]);
+                        var file = localStorage.getItem(key);
+                        if (file == null) {
+                            var url = this.api_url + "/api/get/text/" + this.more._f["user"] + "?id=" + this.more._f["fileId"];
+                            var vm = this;
+                            vm.$set(vm.more._f, 'data', 'loading...');
+                            axios.get(url)
+                                .then(function (rep) {
+                                    localStorage.setItem(key, rep['data']);
+                                    vm.$set(vm.more._f, 'data', rep['data']);
+                                })
+                        } else {
+                            this.$set(this.more._f, "data", file);
+                        }
+                    }
+                },
+                locate_id: function (user, fid) {
+                    // 获取指定 id 的文件内容
+                    function pro_locate_id(arr, fid) {
+                        tmp[fid] = true;
+                        for (var file of arr) {
+                            if (fid == file["fileId"]) {
+                                tmp.process.push({ id: file["fileId"], name: file["fileName"] });
+                                tmp.end = file;
+                                return;
+                            }
+                            if (tmp.end == null && !(file["fileId"] in tmp)) {
+                                tmp.process.push({ id: file["fileId"], name: file["fileName"] });
+                                pro_locate_id(file["child"], fid);
+                                if (tmp.end == null)
+                                    tmp.process.pop();
+                            }
+                        }
+                        return;
+                    }
+                    if (!(user in this.file_list_data))
+                        return false;
+                    tmp = { process: [{ id: -11, name: "~" }], end: null };
+                    if (Number(fid) == -11)
+                        tmp.end = { "child": this.file_list_data[user] };
+                    else
+                        pro_locate_id(this.file_list_data[user], fid);
+                    return tmp;
+                },
+                search: function (key) {
+                    // 搜索
+                    function pro_search(arr, key) {
+                        var atmp = []
+                        for (var file of arr) {
+                            if (key.exec(file["fileName"].toLowerCase()) != null)
+                                atmp.push(file)
+                            if (file["isFolder"])
+                                atmp = atmp.concat(pro_search(file["child"], key))
+                        }
+                        return atmp;
+                    }
+                    if (key == '')
+                        return { process: [{ id: -11, name: key }], end: [] };
+                    key = new RegExp(key);
+
+                    this.$data.more._t = 'search';
+                    var r = []
+                    for (var user of Object.keys(this.file_list_data)) {
+                        r = r.concat(pro_search(this.file_list_data[user], key));
+                    }
+                    return { process: [{ id: -11, name: key }], end: r.sort(function (a, b) { return b["isFolder"] - a["isFolder"] }) };
+                }
+            }
+        })
+    </script>
+</footer>
+
+</html>

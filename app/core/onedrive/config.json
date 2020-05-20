@@ -1,0 +1,18 @@
+{
+    "accounts": {
+        "onedrive_intl": [
+            0,
+            ""
+        ]
+    },
+    "cant_enterFolder": [],
+    "cant_visFile": [
+        "\\..*?"
+    ],
+    "only_Referrer": [],
+    "rootPath": "/",
+    "sys_checkTime": 65,
+    "sys_dataExpiredTime": 1200,
+    "sys_dl_urlExpiredNum": 30,
+    "sys_dl_urlExpiredTime": 600
+}

@@ -1,0 +1,22 @@
+{
+    "accounts": {
+        "cloud189_user1": [
+            "<your_username>",
+            "<your_password>",
+            {}
+        ]
+    },
+    "cant_enterFolder": [
+        "同步盘",
+        "我的.."
+    ],
+    "cant_visFile": [
+        "\\..*?"
+    ],
+    "only_Referrer": [],
+    "sys_checkTime": 60,
+    "sys_cookieExpiredTime": 3600,
+    "sys_dataExpiredTime": 900,
+    "sys_dl_urlExpiredNum": 30,
+    "sys_dl_urlExpiredTime": 300
+}
