@@ -49,7 +49,7 @@ class io:
             uri = uriDir + fileName + "_" + str(int(time.time())) + "." + fileType
 
         try:
-            with open(uri, mode) as f:
+            with open(uri, mode, encoding="utf8") as f:
                 if fileType == "json":
                     data = json.dumps(
                         data,
