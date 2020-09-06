@@ -107,7 +107,8 @@
                                     ]]</a>
                             </li>
                             <li class="mdui-menu-item">
-                                <a target="_blank" href="https://github.com/txperl/JustList" class="mdui-ripple">GitHub@JustList</a>
+                                <a target="_blank" href="https://github.com/txperl/JustList"
+                                    class="mdui-ripple">GitHub@JustList</a>
                             </li>
                         </ul>
                         <!-- 用户选择器 -->
@@ -219,9 +220,9 @@
                             链接：
                             <ul>
                                 <li><a :href="api_url+ '/file/' + more._u + '/?id=' + more._f.fileId">[[
-                                        api_url]]/file/[[ more._u ]]/?id=[[ more._f.fileId ]]</a></li>
+                                        api_url ]]/file/[[ more._u ]]/?id=[[ more._f.fileId ]]</a></li>
                                 <li><a :href="api_url+'/file/' + more._u + get_full_path(paths)">[[
-                                        api_url]]/file/[[ more._u ]][[get_full_path(paths)]]</a></li>
+                                        api_url ]]/file/[[ more._u ]][[ get_full_path(paths) ]]</a></li>
                             </ul>
                         </blockquote>
                         <br>
@@ -241,7 +242,7 @@
                                 :src="api_url + '/file/' + more._u + '/?id=' + more._f.fileId"
                                 controls="controls"></audio>
                             <!-- 文本 -->
-                            <textarea v-else-if="in_support(more._f, 'text') && more._f.fileType !='md'"
+                            <textarea v-else-if="more._f.fileType !='md' && in_support(more._f, 'text')"
                                 :value="more._f.data" class="mdui-textfield-input text-item" rows="12"
                                 readonly></textarea>
                             <!-- markdown -->
@@ -300,7 +301,7 @@
                         "img": ["image", "bmp", "jpg", "jpeg", "png", "gif", "webp"],
                         "audio": ["audiotrack", "mp3", "aac"],
                         "text": ["description", "md", "txt", "json"],
-                        "archive": ["archive", "zip"],
+                        "archive": ["archive", "zip", "rar", "7z", "tar"],
                     }
                 },
                 file_list_data: {},

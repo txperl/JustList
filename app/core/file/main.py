@@ -1,7 +1,6 @@
 # coding=utf-8
 # pylint: disable=relative-beyond-top-level
 import json
-import yaml
 import time
 import os
 
@@ -16,8 +15,6 @@ class io:
                 fileType = uri.split(".")[-1]
                 if fileType == "json":
                     f = json.load(f)
-                elif fileType == "yml" or fileType == "yaml":
-                    f = yaml.safe_load(f)
         except:
             print("\033[31m[failed-load] %s\033[0m" % (uri))
             return False
@@ -49,18 +46,19 @@ class io:
             uri = uriDir + fileName + "_" + str(int(time.time())) + "." + fileType
 
         try:
-            with open(uri, mode, encoding="utf8") as f:
-                if fileType == "json":
-                    data = json.dumps(
-                        data,
-                        ensure_ascii=False,
-                        sort_keys=True,
-                        indent=4,
-                        separators=(", ", ": "),
-                    )
-                elif fileType == "yml" or fileType == "yaml":
-                    data = yaml.dump(data)
-                f.write(data)
+            if fileType == "json":
+                data = json.dumps(
+                    data,
+                    ensure_ascii=False,
+                    sort_keys=True,
+                    indent=4,
+                    separators=(", ", ": "),
+                )
+                with open(uri, mode, encoding="utf8") as f:
+                    f.write(data)
+            else:
+                with open(uri, mode) as f:
+                    f.write(data)
         except:
             print("\033[31m[failed-save] %s -> %s\033[0m" % (fileName, uri))
             return False

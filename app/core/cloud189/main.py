@@ -79,7 +79,6 @@ class core_module_cloud189(object):
                         break
             if isc == False:
                 continue
-
             item = {
                 "isFolder": file["isFolder"],
                 "createTime": file["createTime"],

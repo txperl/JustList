@@ -62,7 +62,6 @@ class cloud189(object):
                     d += self.int2char(15 & v)
         if e == 1:
             d += self.int2char(c << 2)
-        # print(d)
         return d
 
     def redirect(self):
@@ -91,10 +90,10 @@ class cloud189(object):
             },
         )
         if r.text == "0":
-            print("DONT NEED CAPTCHA")
+            # DONT NEED CAPTCHA
             return ""
         else:
-            print("NEED CAPTCHA")
+            print("需要输入验证码")
             r = self.session.get(
                 url="https://open.e.189.cn/api/logbox/oauth2/picCaptcha.do",
                 params={"token": captchaToken},

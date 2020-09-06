@@ -136,9 +136,9 @@ $ python3 main.py
 
 不是必要的操作，但如果你想的话，请按照以下步骤配置。
 
-1. 编辑 `./main.py` ，将 `CORS(app, resources=r"/*")` 取消注释。如果你想指定域，请自行修改。
+1. 编辑 `./main.py` ，将 `CORS(app, resources=r"/*")` 取消注释，并将 `return render_template("md.html")` 及 `if` 语句注释。
 
-（将 `return render_template("md.html")` 注释及 `if` 语句注释）
+（如果想指定可请求的域，请自行修改）
 
 2. 编辑 `./templates/md.html` ，将 `api_url` 改为后端运行地址即可（结尾不含 `/` ）。
 
@@ -178,30 +178,26 @@ $ python3 main.py
 
 此部分可自行修改插件以更改。
 
-1. `api/get/list` 
-
+1. `api/get/list`
 * **获取网盘的目录**
 * 示例
   + `api/get/list` : 返回全部目录
   + `api/get/list/user1/a/x` : 返回 user1 的 a 目录下的 x 目录/文件（如果存在）
   + `api/get/list/user2/?id=xxx` : 返回 user2 的 id 为 xxx 的目录/文件 
 
-2. `api/get/text` 
-
+2. `api/get/text`
 * **获取文件的内容**
 * 示例
   + `api/get/text/user1/a/x` : 返回 user1 的 a 目录下的 x 文件内容（如果存在）
   + `api/get/text/user2/?id=xxx` : 返回 user2 的 id 为 xxx 的文件内容
 
-3. `file` 
-
+3. `file`
 * **直链跳转（下载文件）**
 * 示例
   + `file/user1/a/x` : 重定向至 user1 的 a 目录下的 x 文件下载链接（如果存在）
   + `file/user2/?id=xxx` : 重定向至 user2 的 id 为 xxx 的文件的下载链接
 
-4. `sys/update/xxxiiixxx` 
-
+4. `sys/update/xxxiiixxx`
 * **强制刷新网盘目录缓存**
 
 ## 说明

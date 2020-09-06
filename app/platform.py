@@ -1,7 +1,6 @@
 # coding=utf-8
 import traceback
 import json
-import yaml
 import sys
 import os
 
@@ -86,8 +85,6 @@ class CMDProcessor(object):
                 sfx = uri.split(".")[-1]
                 if sfx == "json":
                     return json.load(c)
-                elif sfx == "yml" or sfx == "yaml":
-                    return yaml.safe_load(c)
                 else:
                     return c
         except Exception as e:
