@@ -2,12 +2,11 @@
 
 > JustList，仅仅是目录。
 >
-> 没错，又一款简单的网盘文件列表与分享工具...
+> 没错，又一款简单的网盘文件列表与分享工具。
 
 支持天翼云盘、OneDrive、OneDrive 世纪互联，可以同时启用多个云盘的多个用户。当然，也有一个简单的缓存与自动刷新系统。
 
 * [Demo for JustList](https://lib.tls.moe/)
-* [README_EN.md](README_EN.md)
 
 ## 部署
 
@@ -54,9 +53,15 @@ $ pip3 install -r requirements.txt
             {}
         ]
     },
-    "cant_enterFolder": ["同步盘"], // 禁止访问的文件夹，正则 match
-    "cant_visFile": ["\\..*?"],    // 禁止文件名，正则 match
+    "cant_enterFolder": [          // 禁止访问的文件夹，正则 match
+        "同步盘",
+        "我的.."
+    ],
+    "cant_visFile": [              // 禁止文件名，正则 match
+        "\\..*?"
+    ],
     "only_Referrer": [],           // 简单防盗链，允许的 Referrer，留空为全部允许，正则 search
+    "rootPath": "/",               // 根目录
     "sys_checkTime": 60,           // 更新任务线程间隔
     "sys_cookieExpiredTime": 3600, // cookie 缓存有效时间
     "sys_dataExpiredTime": 900,    // 文件目录缓存有效时间
@@ -72,17 +77,19 @@ $ pip3 install -r requirements.txt
 ``` 
 {
     "accounts": {
-        "onedrive_user1": [
+        "onedrive_intl": [
             0,                   // 0 为国际版，1 为世纪互联
-            ""                   // refresh_token，留空时程序会引导填写，也可提前填写（但必须存在）
+            ""                   // refresh_token，留空时程序会引导填写，也可提前填写（但必须存在此字段）
         ],
-        "onedrive_user2": [
+        "onedrive_cn": [
             1,
             ""
         ]
     },
     "cant_enterFolder": [],      // 禁止访问的文件夹，正则 match
-    "cant_visFile": ["\\..*?"],  // 禁止文件名，正则 match
+    "cant_visFile": [            // 禁止文件名，正则 match
+        "\\..*?"
+    ],
     "only_Referrer": [],         // 简单防盗链，允许的 Referrer，留空为全部允许，正则 search
     "rootPath": "/",             // 根目录
     "sys_checkTime": 65,         // 更新任务线程间隔
@@ -93,10 +100,6 @@ $ pip3 install -r requirements.txt
 ```
 
 注意，以上两个配置文件中 `accounts` 中自定义的**多用户用户名不可重复**！
-
-##### Refresh Token
-
-若在配置中保留此项为空，那么程序会在第一次初始化时引导你获取 code 后自动获得 refresh_token，并且会保存在配置文件中。
 
 ##### Client ID 等更改
 
@@ -143,6 +146,12 @@ $ python3 main.py
 2. 编辑 `./templates/md.html` ，将 `api_url` 改为后端运行地址即可（结尾不含 `/` ）。
 
 （如果配置文件中设置了 `only_Referrer` ，请注意修改）
+
+### 其他
+
+#### md 主题的默认显示用户
+
+若要自定义前端 md 主题的默认显示用户，即优先显示的网盘文件列表，可修改 `./templates/md.html` 中 `root_user` 一项。
 
 ## 开发
 

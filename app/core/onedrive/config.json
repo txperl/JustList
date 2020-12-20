@@ -3,6 +3,10 @@
         "onedrive_intl": [
             0,
             ""
+        ],
+        "onedrive_cn": [
+            1,
+            ""
         ]
     },
     "cant_enterFolder": [],

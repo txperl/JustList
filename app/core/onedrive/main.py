@@ -1,5 +1,4 @@
 # coding=utf-8
-# pylint: disable=relative-beyond-top-level,unused-wildcard-import
 from ...platform import CMDProcessor
 from ..file import main as ifile
 from . import onedrive
@@ -105,7 +104,7 @@ class core_module_onedrive(object):
             self.list[u] = tmp
             self.inCheck = False
             self.lock.release()
-            print(f"[onedrive] {u} list updated")
+            # print(f"[onedrive] {u} list updated")
         self.listOutdated = time.time() + self.conf["sys_dataExpiredTime"]
         return True
 

@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JustList</title>
 
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mdui@0.4.3/dist/css/mdui.min.css">
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.css">
     <style>
         .mdui-typo img {
@@ -219,9 +219,9 @@
                             用户：[[ more._f.user ]]<br>
                             链接：
                             <ul>
-                                <li><a :href="api_url+ '/file/' + more._u + '/?id=' + more._f.fileId">[[
+                                <li><a :href="api_url + '/file/' + more._u + '/?id=' + more._f.fileId">[[
                                         api_url ]]/file/[[ more._u ]]/?id=[[ more._f.fileId ]]</a></li>
-                                <li><a :href="api_url+'/file/' + more._u + get_full_path(paths)">[[
+                                <li><a :href="api_url + '/file/' + more._u + get_full_path(paths)">[[
                                         api_url ]]/file/[[ more._u ]][[ get_full_path(paths) ]]</a></li>
                             </ul>
                         </blockquote>
@@ -261,7 +261,7 @@
 </body>
 
 <footer>
-    <script src="//cdn.jsdelivr.net/npm/mdui@0.4.3/dist/js/mdui.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/axios@0.19.2/dist/axios.min.js"></script>
@@ -270,7 +270,7 @@
     <script src="//cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/v-viewer@1.5.1/dist/v-viewer.min.js"></script>
     <script>
-        version = 2020052001;
+        version = 1;
         tmp = {}; // 全局暂留
 
         Vue.use(VueLazyload, {
@@ -306,15 +306,16 @@
                 },
                 file_list_data: {},
                 root_url: window.location.protocol + '//' + window.location.host, // 前端域
-                api_url: window.location.protocol + '//' + window.location.host // 后端域
+                api_url: window.location.protocol + '//' + window.location.host, // 后端域
+                root_user: "" // 默认用户
             },
             created: function () {
-                // 初始化数据获取
-                var data = localStorage.getItem("cloud_list");
-                var outdated = localStorage.getItem("cloud_outdated");
-                var tmpversion = localStorage.getItem("cloud_version");
+                // 获取数据
+                let data = localStorage.getItem("cloud_list");
+                const outdated = localStorage.getItem("cloud_outdated");
+                const tmpversion = localStorage.getItem("cloud_version");
                 if (data == null || outdated == null || tmpversion == null || tmpversion < version || outdated <= Date.parse(new Date())) {
-                    var vm = this;
+                    const vm = this;
                     axios.get(this.api_url + "/api/get/list")
                         .then(function (rep) {
                             localStorage.setItem('cloud_list', JSON.stringify(rep["data"]));
@@ -349,8 +350,8 @@
                 load_data: function (vm, data) {
                     // 加载数据
                     try {
-                        data = jQuery.parseJSON(data);
-                        if (data["code"] != 1 || Object.keys(data["msg"]).length == 0)
+                        data = JSON.parse(data);
+                        if (data["code"] !== 1 || Object.keys(data["msg"]).length === 0)
                             throw new Error();
                     } catch (e) {
                         console.log(e);
@@ -369,7 +370,7 @@
                     vm.more.users = Object.keys(data["msg"]);
                 },
                 go_click_hash: function (event, hash) {
-                    if (event.target.className != "mdui-float-right mdui-icon material-icons") {
+                    if (event.target.className !== "mdui-float-right mdui-icon material-icons") {
                         this.go_hash(hash);
                     }
                 },
@@ -383,7 +384,7 @@
                         return;
                     }
                     for (let i = this.paths.length - 1; i >= 0; i--) {
-                        if (i == Number(this.paths.length) - 1 - step) {
+                        if (i === Number(this.paths.length) - 1 - step) {
                             this.go_hash("/list/" + this.more._u + "/" + String(this.paths[i].id));
                             break;
                         }
@@ -399,7 +400,7 @@
                 get_full_path: function (paths) {
                     r = "/";
                     for (x of paths) {
-                        if (x.id != -11) {
+                        if (x.id !== -11) {
                             r = r + x.name + "/";
                         }
                     }
@@ -408,14 +409,14 @@
                 get_nexAndPrv: function (user, nowid) {
                     if (this.paths.length > 1) {
                         for (let i = this.paths.length - 1; i >= 0; i--) {
-                            if (i == Number(this.paths.length) - 2) {
+                            if (i === Number(this.paths.length) - 2) {
                                 var toid = this.paths[i].id;
                                 var data = this.locate_id(user, toid);
                                 if (data.end != null) {
                                     for (let j = 0; j < data.end.child.length; j++) {
-                                        if (data.end.child[j].fileId == nowid) {
-                                            var pre = (j != 0) ? data.end.child[j - 1].fileId : "";
-                                            var nex = (j != data.end.child.length - 1) ? data.end.child[j + 1].fileId : "";
+                                        if (data.end.child[j].fileId === nowid) {
+                                            var pre = (j !== 0) ? data.end.child[j - 1].fileId : "";
+                                            var nex = (j !== data.end.child.length - 1) ? data.end.child[j + 1].fileId : "";
                                             return [pre, nex];
                                         }
                                     }
@@ -427,7 +428,7 @@
                     return ["", ""];
                 },
                 show: function (type, id) {
-                    if (type == 'img') {
+                    if (type === 'img') {
                         if ($(id + ' img').length > 0) {
                             $(id)[0].$viewer.reset()
                             $(id)[0].$viewer.show()
@@ -441,23 +442,23 @@
                 },
                 change_type: function (c) {
                     this.more._t = c;
-                    if (c == 'list') {
+                    if (c === 'list') {
                         $(".mdui-textfield").removeClass("mdui-textfield-expanded")
                         this.more._s = "";
                     }
                 },
                 in_support: function (file, type = 0) {
-                    var format = file.fileType;
-                    var arr = this.more.format_support;
+                    let format = file.fileType;
+                    const arr = this.more.format_support;
                     if (format != null)
                         format = format.toLowerCase()
-                    if (type != 0) {
-                        return (arr[type].indexOf(format) != -1);
+                    if (type !== 0) {
+                        return (arr[type].indexOf(format) !== -1);
                     } else {
                         if (file.isFolder)
                             return this.more.format_support['file'][0];
                         for (let t of Object.keys(arr)) {
-                            if (arr[t].indexOf(format) != -1) {
+                            if (arr[t].indexOf(format) !== -1) {
                                 return this.more.format_support[t][0];
                             }
                         }
@@ -467,13 +468,14 @@
                 sort_array: function (arr) {
                     function func(a, b) {
                         if (a.isFolder || b.isFolder) return 0;
-                        var x1 = a.fileName;
-                        var x2 = b.fileName;
+                        const x1 = a.fileName;
+                        const x2 = b.fileName;
                         if (x1 < x2) return -1;
                         if (x1 > x2) return 1;
                         return 0;
                     }
-                    var r = {};
+
+                    let r = {};
                     try {
                         r = arr.slice().sort(func);
                     } catch (e) {
@@ -483,40 +485,39 @@
                     return r;
                 },
                 toPath: function (path) {
+                    let may, type;
                     this.more._f = this.temp._f;
                     paths = path.split('/');
                     // /#/type/user/id
                     // type: list, file
                     // user: of users
                     // id: file id
-                    if (paths.length == 4) {
-                        var type = paths[1];
-                        var user = paths[2];
-                        var id = paths[3];
+                    if (paths.length === 4) {
+                        type = paths[1];
+                        const user = paths[2];
+                        const id = paths[3];
 
-                        if (id == -11) {
+                        if (id === -11) {
                             this.paths = [{ id: -11, name: "~" }];
                             this.files = this.file_list_data[user];
-                            // this.more._f = this.temp._f;
                             this.more._u = user;
                             return;
                         }
 
                         may = this.locate_id(user, id);
                         if (may.end != null) {
-                            if (type == 'list') {
+                            if (type === 'list') {
                                 this.paths = may.process;
                                 this.files = may.end.child;
                                 this.more._u = user;
                                 this.more._f = may.end;
-                                var onetwo = this.get_nexAndPrv(user, id);
+                                const onetwo = this.get_nexAndPrv(user, id);
                                 this.$set(this.more._f, "prev", onetwo[0]);
                                 this.$set(this.more._f, "next", onetwo[1]);
-                            } else if (type == 'file') {
+                            } else if (type === 'file') {
                                 window.location.href = this.api_url + '/file/' + user + '/?id=' + id;
                                 this.paths = [{ id: -11, name: "~" }];
                                 this.files = this.file_list_data[user];
-                                // this.more._f = this.temp._f;
                             }
                         } else {
                             window.location.href = this.root_url;
@@ -524,33 +525,37 @@
                         // /#/type/key
                         // type: search
                         // key: keyword
-                    } else if (paths.length == 3) {
-                        var type = paths[1];
-                        var key = decodeURI(paths[2]);
+                    } else if (paths.length === 3) {
+                        type = paths[1];
+                        let key = decodeURI(paths[2]);
                         may = this.search(key);
                         if (may) {
                             this.paths = may.process;
                             this.files = may.end;
                             this.more._s = key;
-                            // this.more._f = this.temp._f;
                         }
                     } else {
                         this.paths = [{ id: -11, name: "~" }];
+                        const keys = Object.keys(this.file_list_data);
+                        if (keys.indexOf(this.root_user) !== -1)
+                            this.more._u = this.root_user;
+                        else
+                            this.more._u = keys[0];
                         this.files = this.file_list_data[this.more._u];
-                        // this.more._f = this.temp._f;
                     }
 
                     // 加载 more._f 的文件内容（如果有）
-                    if (!this.more._f["isFolder"] && this.more.format_support.text.indexOf(this.more._f["fileType"]) != -1) {
-                        var key = "cache_text_" + String(this.more._f["fileId"]);
-                        var file = localStorage.getItem(key);
+                    if (!this.more._f["isFolder"] && this.more.format_support.text.indexOf(this.more._f["fileType"]) !== -1) {
+                        const key = "cache_text_" + String(this.more._f["fileId"]);
+                        const file = null;
+                        // const file = localStorage.getItem(key);
                         if (file == null) {
-                            var url = this.api_url + "/api/get/text/" + this.more._f["user"] + "?id=" + this.more._f["fileId"];
-                            var vm = this;
+                            const url = this.api_url + "/api/get/text/" + this.more._f["user"] + "?id=" + this.more._f["fileId"];
+                            const vm = this;
                             vm.$set(vm.more._f, 'data', 'loading...');
                             axios.get(url)
                                 .then(function (rep) {
-                                    localStorage.setItem(key, rep['data']);
+                                    // localStorage.setItem(key, rep['data']);
                                     vm.$set(vm.more._f, 'data', rep['data']);
                                 })
                         } else {
@@ -563,7 +568,7 @@
                     function pro_locate_id(arr, fid) {
                         tmp[fid] = true;
                         for (var file of arr) {
-                            if (fid == file["fileId"]) {
+                            if (fid === file["fileId"]) {
                                 tmp.process.push({ id: file["fileId"], name: file["fileName"] });
                                 tmp.end = file;
                                 return;
@@ -577,10 +582,11 @@
                         }
                         return;
                     }
+
                     if (!(user in this.file_list_data))
                         return false;
                     tmp = { process: [{ id: -11, name: "~" }], end: null };
-                    if (Number(fid) == -11)
+                    if (Number(fid) === -11)
                         tmp.end = { "child": this.file_list_data[user] };
                     else
                         pro_locate_id(this.file_list_data[user], fid);
@@ -598,16 +604,20 @@
                         }
                         return atmp;
                     }
-                    if (key == '')
+
+                    if (key === '')
                         return { process: [{ id: -11, name: key }], end: [] };
                     key = new RegExp(key);
 
                     this.$data.more._t = 'search';
                     var r = []
-                    for (var user of Object.keys(this.file_list_data)) {
+                    for (var user of Object.keys(this.file_list_data))
                         r = r.concat(pro_search(this.file_list_data[user], key));
-                    }
-                    return { process: [{ id: -11, name: key }], end: r.sort(function (a, b) { return b["isFolder"] - a["isFolder"] }) };
+                    return {
+                        process: [{ id: -11, name: key }], end: r.sort(function (a, b) {
+                            return b["isFolder"] - a["isFolder"]
+                        })
+                    };
                 }
             }
         })

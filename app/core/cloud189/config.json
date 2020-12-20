@@ -4,6 +4,11 @@
             "<your_username>",
             "<your_password>",
             {}
+        ],
+        "cloud189_user2": [
+            "<your_username>",
+            "<your_password>",
+            {}
         ]
     },
     "cant_enterFolder": [
@@ -14,6 +19,7 @@
         "\\..*?"
     ],
     "only_Referrer": [],
+    "rootPath": "/",
     "sys_checkTime": 60,
     "sys_cookieExpiredTime": 3600,
     "sys_dataExpiredTime": 900,

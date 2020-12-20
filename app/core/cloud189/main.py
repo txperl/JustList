@@ -1,14 +1,11 @@
 # coding=utf-8
-# pylint: disable=relative-beyond-top-level,unused-wildcard-import
-from ...platform import CMDProcessor
-from ..file import main as ifile
-from . import cloud189
-import threading
-import json
-import time
-import sys
 import re
-import os
+import threading
+import time
+
+from . import cloud189
+from ..file import main as ifile
+from ...platform import CMDProcessor
 
 
 @CMDProcessor.core_register_auto(
@@ -24,6 +21,7 @@ class core_module_cloud189(object):
         self.list = {}
         self.inCheck = False
         self.lock = threading.Lock()
+        self.rootPath = [x for x in self.conf["rootPath"].split("/") if x != ""]
 
     def auto(self):
         for u in self.conf["accounts"]:
@@ -51,33 +49,40 @@ class core_module_cloud189(object):
         return self
 
     def load_list(self):
-        for k in self.conf["accounts"].copy():
+        for user in self.conf["accounts"].copy():
             tmp = []
-            self.__proLoad_list(k, tmp, -11, str(k) + "/")
+            self.__proLoad_list(user, tmp, -11, str(user) + "/", 0)
             self.lock.acquire()
             self.inCheck = True
-            self.list[k] = tmp
+            self.list[user] = tmp
             self.inCheck = False
             self.lock.release()
-            print(f"[cloud189] {k} list updated")
+            # print(f"[cloud189] {user} list updated")
         self.listOutdated = time.time() + self.conf["sys_dataExpiredTime"]
         return True
 
-    def __proLoad_list(self, user=None, arr=[], fileId=-11, struri=""):
+    def __proLoad_list(self, user=None, arr=[], fileId=-11, struri="", rootIndex=0):
         data = self.api[user].get_files(fileId)
         for file in data:
-            isc = True
+            # 进入根目录
+            if len(self.rootPath) != 0 and rootIndex <= len(self.rootPath) - 1:
+                if file["isFolder"] and file["fileName"] == self.rootPath[rootIndex - 1]:
+                    self.__proLoad_list(
+                        user, arr, file["fileId"], struri + file["fileName"] + "/", rootIndex + 1
+                    )
+                continue
+            isPass = True
             if not file["isFolder"]:
                 for x in self.conf["cant_visFile"]:
                     if re.match(x, file["fileName"]) != None:
-                        isc = False
+                        isPass = False
                         break
             else:
                 for x in self.conf["cant_enterFolder"]:
                     if re.match(x, file["fileName"]) != None:
-                        isc = False
+                        isPass = False
                         break
-            if isc == False:
+            if isPass == False:
                 continue
             item = {
                 "isFolder": file["isFolder"],
@@ -99,7 +104,7 @@ class core_module_cloud189(object):
                 tmp = []
                 item["child"] = tmp
                 self.__proLoad_list(
-                    user, tmp, file["fileId"], struri + file["fileName"] + "/"
+                    user, tmp, file["fileId"], struri + file["fileName"] + "/", rootIndex + 1
                 )
             arr.append(item)
         return True
@@ -182,7 +187,7 @@ class core_module_cloud189(object):
                 self.lock.acquire()
                 self.token[u] = tmp
                 self.token[u]["outdated"] = (
-                    time.time() + self.conf["sys_cookieExpiredTime"]
+                        time.time() + self.conf["sys_cookieExpiredTime"]
                 )
                 self.conf["accounts"][u][2] = self.token[u]
                 self.lock.release()
