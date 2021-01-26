@@ -6,10 +6,11 @@ import os
 
 ENVIRON = {"ROOTPATH": os.path.split(os.path.realpath(sys.argv[0]))[0] + "/"}
 
-
 class CMDProcessor(object):
     PLUGINS = {}
-    CORES_LIST = []
+
+    def __init__(self):
+        self.ENVIRON = ENVIRON
 
     def process(self, cmd):
         reacmd = cmd
@@ -21,11 +22,6 @@ class CMDProcessor(object):
                     reacmd = x
             if reacmd == None:
                 return {"code": 0, "msg": "no method"}
-
-        for x in self.CORES_LIST:
-            f = getattr(self, x)()
-            setattr(self, x, f)
-        self.ENVIRON = ENVIRON
 
         try:
             r = self.PLUGINS[reacmd](self).pRun(cmd)
@@ -48,8 +44,7 @@ class CMDProcessor(object):
     @classmethod
     def core_register(cls, core_name):
         def wrapper(core):
-            setattr(cls, core_name, core)
-            cls.CORES_LIST.append(core_name)
+            setattr(cls, core_name, core())
             return core
 
         return wrapper

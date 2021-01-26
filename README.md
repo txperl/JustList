@@ -29,12 +29,6 @@ $ pip3 install -r requirements.txt
 
 ### 修改配置
 
-#### 强制刷新地址
-
-编辑 `./app/plugin/sys_update.py` ，将 `sys/update/xxxiiixxx` 改为你想要的强制刷新地址。
-
-**这部分请务必修改（或将此插件停用）**！否则可能会被恶意请求。
-
 #### 天翼云盘（可选）
 
 编辑 `./app/core/cloud189/config.json` 。
@@ -127,6 +121,14 @@ from .onedrive.main import * # 开启 OneDrive
 from .cloud189.main import * # 开启 天翼云盘
 ```
 
+#### 强制刷新地址（可选）
+
+如果需要强制刷新目录缓存，请先编辑 `./app/plugin/__init__.py` ，取消 `sys_update` 注释。
+
+编辑 `./app/plugin/sys_update.py` ，将 `sys/update/xxxiiixxx` 改为你想要的强制刷新地址。
+
+**默认为停用状态，若要开启请务必修改地址**！否则可能会被恶意请求。
+
 ### 启动程序
 
 ``` bash
@@ -181,7 +183,7 @@ $ python3 main.py
 ├── README.md
 ```
 
-简略框架说明可以查看[PixivBiu-后端](https://biu.tls.moe/#/develop/backend)。
+简略框架说明可以查看[PixivBiu 后端](https://biu.tls.moe/#/develop/backend)。
 
 ### API
 
