@@ -9,18 +9,18 @@ import os
 
 clientId = [
     "78d4dc35-7e46-42c6-9023-2d39314433a5",
-    "3ff8580b-62e2-47ea-94f1-47e41440122c",
+    "dfe36e60-6133-48cf-869f-4d15b8354769",
 ]
 clientSecret = [
     "ZudGl-p.m=LMmr3VrKgAyOf-WevB3p50",
-    "]QBuL?/vK?F8XGzf9G70OSEmW.P0hAo.",
+    "H0-1:6.Sb8:WCW/J-c]K@fddCt[i0EZ2",
 ]
 oauthHost = [
     "https://login.microsoftonline.com",
     "https://login.partner.microsoftonline.cn",
 ]
 apiHost = ["https://graph.microsoft.com", "https://microsoftgraph.chinacloudapi.cn"]
-redirectHost = ["http://localhost/onedrive-login", "http://localhost:5001/auth_redirect_url"]
+redirectHost = ["http://localhost/onedrive-login", "http://localhost/onedrive-login"]
 
 
 class Utils:
@@ -56,11 +56,14 @@ class Utils:
 
     @staticmethod
     def formatTime(s="", f="%Y/%m/%d %H:%M:%S"):
+        s_ = str(s)
         try:
-            assert s
-            return time.strftime(f, time.strptime(str(s), "%Y-%m-%dT%H:%M:%SZ"))
+            return time.strftime(f, time.strptime(s_, "%Y-%m-%dT%H:%M:%SZ"))
         except:
-            return str("unknow")
+            try:
+                return time.strftime(f, time.strptime(s_, "%Y-%m-%dT%H:%M:%S.%fZ"))
+            except:
+                return "unknow"
 
     @staticmethod
     def http(url, method="GET", headers=None, data=None, coding="utf-8", redirect=True):
@@ -116,7 +119,7 @@ class OneDrive:
             "client_secret": clientSecret[IS_CN],
             "redirect_uri": redirectUri,
             "grant_type": grantType,
-            "scope": "User.Read Files.ReadWrite.All",
+            "scope": "User.Read Files.ReadWrite.All offline_access",
         }
 
     @staticmethod
@@ -156,7 +159,7 @@ class OneDrive:
             self.access_token = resp["access_token"]
             self.refresh_token = resp["refresh_token"]
         else:
-            raise Exception("Error, Get refresh token.")
+            raise Exception("Error, Get Refresh Token.")
 
     def getAccessToken(self, refreshToken=None):
         data = self.accessData(
@@ -179,7 +182,7 @@ class OneDrive:
             self.refresh_token = resp["refresh_token"]
             return resp
         else:
-            raise Exception("Error, Get Access.")
+            raise Exception("Error, Get Access Token.")
 
     def get_file_info(self, fId, dl):
         path = fId

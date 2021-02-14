@@ -66,7 +66,7 @@ class core_module_cloud189(object):
         for file in data:
             # 进入根目录
             if len(self.rootPath) != 0 and rootIndex <= len(self.rootPath) - 1:
-                if file["isFolder"] and file["fileName"] == self.rootPath[rootIndex - 1]:
+                if file["isFolder"] and file["fileName"] == self.rootPath[rootIndex]:
                     self.__proLoad_list(
                         user, arr, file["fileId"], struri + file["fileName"] + "/", rootIndex + 1
                     )

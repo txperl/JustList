@@ -21,15 +21,15 @@
 
 下述说明看似很多，其实内容很少（可能是废话太多了？hhh）。
 
-### 安装依赖
+### 1. 安装依赖
 
 ``` bash
 $ pip3 install -r requirements.txt
 ```
 
-### 修改配置
+### 2. 修改配置
 
-#### 天翼云盘（可选）
+#### 2.1. 天翼云盘（可选）
 
 编辑 `./app/core/cloud189/config.json` 。
 
@@ -64,7 +64,7 @@ $ pip3 install -r requirements.txt
 }
 ```
 
-#### OneDrive（可选）
+#### 2.2. OneDrive（可选）
 
 编辑 `./app/core/onedrive/config.json` 。
 
@@ -95,22 +95,24 @@ $ pip3 install -r requirements.txt
 
 注意，以上两个配置文件中 `accounts` 中自定义的**多用户用户名不可重复**！
 
-##### Client ID 等更改
+##### 2.2.1 Client ID 等更改
 
-如果你想使用自己的客户端 ID 和密码，请修改 `./app/core/onedrive/onedrive.py` 头部的变量。
+**如果你遇到与 Token 验证相关的错误，请务必尝试修改此项。**
+
+如果想使用自己的客户端 ID 和密码，请修改 `./app/core/onedrive/onedrive.py` 头部的变量。
 
 例如，
 
 ``` 
 clientId = [
     "78d4dc35-7e46-42c6-9023-2d39314433a5",
-    "3ff8580b-62e2-47ea-94f1-47e41440122c",
+    "dfe36e60-6133-48cf-869f-4d15b8354769",
 ]
 ```
 
 第一行为 OneDrive 国际版的，第二行为世纪互联版的。
 
-### 启用核心
+### 3. 启用核心
 
 默认不会加载任何服务。若要开启服务，请**正确修改各配置后**启用加载核心。
 
@@ -121,7 +123,7 @@ from .onedrive.main import * # 开启 OneDrive
 from .cloud189.main import * # 开启 天翼云盘
 ```
 
-#### 强制刷新地址（可选）
+#### 3.1. 强制刷新目录缓存（可选）
 
 如果需要强制刷新目录缓存，请先编辑 `./app/plugin/__init__.py` ，取消 `sys_update` 注释。
 
@@ -129,29 +131,24 @@ from .cloud189.main import * # 开启 天翼云盘
 
 **默认为停用状态，若要开启请务必修改地址**！否则可能会被恶意请求。
 
-### 启动程序
+### 4. 启动程序
 
 ``` bash
 $ python3 main.py
 ```
 
-（若要更改程序的运行地址，请修改 `./main.py` ）
+若要更改程序的运行地址，请修改 `./main.py`，默认为 `http://127.0.0.1:5000/`。
 
-### 前后端分离（可选）
+### 5. 前后端分离（可选）
 
 不是必要的操作，但如果你想的话，请按照以下步骤配置。
 
 1. 编辑 `./main.py` ，将 `CORS(app, resources=r"/*")` 取消注释，并将 `return render_template("md.html")` 及 `if` 语句注释。
-
-（如果想指定可请求的域，请自行修改）
-
 2. 编辑 `./templates/md.html` ，将 `api_url` 改为后端运行地址即可（结尾不含 `/` ）。
 
-（如果配置文件中设置了 `only_Referrer` ，请注意修改）
+### 6. 其他
 
-### 其他
-
-#### md 主题的默认显示用户
+#### 6.1. md 主题的默认显示用户
 
 若要自定义前端 md 主题的默认显示用户，即优先显示的网盘文件列表，可修改 `./templates/md.html` 中 `root_user` 一项。
 
@@ -183,7 +180,7 @@ $ python3 main.py
 ├── README.md
 ```
 
-简略框架说明可以查看[PixivBiu 后端](https://biu.tls.moe/#/develop/backend)。
+简略框架说明可以查看 [PixivBiu-后端](https://biu.tls.moe/#/develop/backend)。
 
 ### API
 

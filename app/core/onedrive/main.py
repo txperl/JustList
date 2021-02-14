@@ -33,7 +33,7 @@ class core_module_onedrive(object):
             ms = onedrive.OneDrive("", IS_CN=is_cn)
             if refreshToken == "":
                 while True:
-                    print("进入以下网址以获取 Code 字段")
+                    print(f"[{u}] 进入以下网址以获取 Code 字段")
                     print(
                         f"{onedrive.oauthHost[is_cn]}/common/oauth2/v2.0/authorize?client_id={onedrive.clientId[is_cn]}&response_type=code&redirect_uri={onedrive.redirectHost[is_cn]}&response_mode=query&scope=offline_access%20User.Read%20Files.ReadWrite.All"
                     )
