@@ -1,11 +1,15 @@
 # coding=utf-8
-# pylint: disable=relative-beyond-top-level
 import json
-import time
 import os
+import time
+
+import yaml
+
+from altfe.interface.root import interRoot
 
 
-class io:
+@interRoot.bind("file", "LIB_STATIC")
+class static_file(object):
     @staticmethod
     def ain(uri, mode="r"):
         if not os.path.exists(uri):
@@ -14,11 +18,15 @@ class io:
             with open(uri, mode) as f:
                 fileType = uri.split(".")[-1]
                 if fileType == "json":
-                    f = json.load(f)
+                    r = json.load(f)
+                elif fileType == "yml" or fileType == "yaml":
+                    r = yaml.safe_load(f)
+                else:
+                    r = f.read()
         except:
             print("\033[31m[failed-load] %s\033[0m" % (uri))
             return False
-        return f
+        return r
 
     @staticmethod
     def aout(uri, data, mode="w", dRename=False):
@@ -62,10 +70,10 @@ class io:
         except:
             print("\033[31m[failed-save] %s -> %s\033[0m" % (fileName, uri))
             return False
-        print(
-            "\033[32m[saved]\033[0m \033[36m%s\033[0m -> \033[36m%s\033[0m"
-            % (fileName, uri)
-        )
+        # print(
+        #     "\033[32m[saved]\033[0m \033[36m%s\033[0m -> \033[36m%s\033[0m"
+        #     % (fileName, uri)
+        # )
         return True
 
     @staticmethod
@@ -77,5 +85,5 @@ class io:
         except:
             print("\033[31m[failed-remove] %s\033[0m" % (uri))
             return False
-        print("\033[32m[removed]\033[0m \033[36m%s\033[0m" % (uri))
+        # print("\033[32m[removed]\033[0m \033[36m%s\033[0m" % (uri))
         return True

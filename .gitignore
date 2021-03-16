@@ -172,3 +172,5 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+.token.json

@@ -1,85 +1,66 @@
 # coding=utf-8
-# pylint: disable=relative-beyond-top-level
-from ..platform import CMDProcessor
-from flask import redirect, jsonify, request
-import time
-import re
+
+from flask import redirect
+
+from altfe.interface.root import interRoot
 
 
-@CMDProcessor.plugin_register("file")
-class do_file(object):
-    def __init__(self, MOD):
-        self.MOD = MOD
-
-    def pRun(self, cmd):
+@interRoot.bind("file/", "PLUGIN")
+class do_file(interRoot):
+    def run(self, cmd):
         try:
-            argv = self.MOD.args.gets(["id=None"])
+            argv = self.STATIC.arg.gets(["id={_none}", "password={_blank}"])
         except:
-            return jsonify({"code": 0, "msg": "missing parameters"}), 400
+            return {"code": 0, "msg": "missing parameters"}
 
-        filePath = [x for x in cmd[4:].split("/") if x != ""]
+        filePath = [x for x in cmd.split("/") if x != ""]
         if len(filePath) == 0:
-            return jsonify({"code": 0, "msg": "missing parameters"}), 400
+            return {"code": 0, "msg": "missing parameters"}
         user = filePath[0]
         full = "/".join(filePath)
         api = None
 
         # 确定具体 api
-        for name in dir(self.MOD):
+        for name in dir(self.CORE):
             if "cloud_" in name:
-                tmp = getattr(self.MOD, name)
+                tmp = getattr(self.CORE, name)
                 if user in tmp.list:
                     api = tmp
                     break
 
-        if api == None:
-            return jsonify({"code": 0, "msg": "unknown user"}), 400
-
-        # 简单验证 Referrer
-        if len(api.conf["only_Referrer"]) != 0:
-            isc = False
-            for x in api.conf["only_Referrer"]:
-                if re.search(x, str(request.referrer)) != None:
-                    isc = True
-                    break
-            if isc == False:
-                return "Request Forbidden.", 403
-
-        # 如果有线程正在更新，则阻塞
-        # trysum = 0
-        # while True:
-        #     if api.inCheck == False or trysum > 10:
-        #         break
-        #     trysum += 1
-        #     time.sleep(0.5)
+        if api is None:
+            return {"code": 0, "msg": "unknown user"}
 
         # 读取缓存
-        key = argv["id"] if argv["id"] != "None" else full
-        _link = [self.MOD.cache.get(user + "_" + key), self.MOD.cache.get(user + "_" + key, "visnum")]
-        if _link[0] != None and _link[1] != None:
+        key = self.STATIC.util.md5(full + str(argv["id"]) + str(argv["password"]))
+        _link = [self.CORE.cache.get(key), self.CORE.cache.get(key, "visnum"), self.CORE.cache.get(key + "_psw")]
+        if _link[0] is not None:
             if _link[1] <= api.conf["sys_dl_urlExpiredNum"]:
-                return redirect(_link[0])
+                if _link[2] == argv["password"]:
+                    return redirect(_link[0])
             else:
-                self.MOD.cache.delete(user + "_" + key)
+                self.CORE.cache.delete(key)
+                self.CORE.cache.delete(key + "_psw")
 
         # 检查权限与确定唯一 id
-        if argv["id"] != "None":
-            fId = argv["id"]
+        if argv["id"] is not None:
+            fId = str(argv["id"])
             # 已有 id，但需要确定是否在文件列表中（是否可访问）
-            if not api.locate_id(user, fId):
+            if not api.locate_id(user, fId, [x for x in argv["password"].split("._.") if x != ""]):
                 return "404 Not Found.", 404
         else:
             # 已有文件在文件列表中的路径，需要确定唯一 id
-            file = api.locate(user, filePath)
+            file = api.locate(user, filePath, [x for x in argv["password"].split("._.") if x != ""])
             if not file:
                 return "404 Not Found.", 404
-            fId = file["fileId"]
+            fId = file[0]["fileId"]
 
         # 获取下载链接
         url = api.info(user, fId, True)
 
         if url:
-            self.MOD.cache.set(user + "_" + key, url, api.conf["sys_dl_urlExpiredTime"])
+            self.CORE.cache.set(key, url, api.conf["sys_dl_urlExpiredTime"])
+            self.CORE.cache.set(key + "_psw", argv["password"], api.conf["sys_dl_urlExpiredTime"] + 2)
             return redirect(url)
         else:
-            return "Not a File.", 400
+            return "Have no File.", 400

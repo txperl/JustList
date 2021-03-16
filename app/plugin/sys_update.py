@@ -1,23 +1,18 @@
 # coding=utf-8
-# pylint: disable=relative-beyond-top-level
-from ..platform import CMDProcessor
+from altfe.interface.root import interRoot
 
 
-@CMDProcessor.plugin_register("sys/update/xxxiiixxx")
-class sys_update(object):
-    def __init__(self, MOD):
-        self.MOD = MOD
-
-    def pRun(self, cmd):
+@interRoot.bind("sys/update/xxxiiixxx", "PLUGIN")
+class sys_update(interRoot):
+    def run(self, cmd):
         apis = []
         # 列出所有 api
-        for name in dir(self.MOD):
+        for name in dir(self.CORE):
             if "cloud_" in name:
-                apis.append(getattr(self.MOD, name))
-
+                apis.append(getattr(self.CORE, name))
         try:
             for api in apis:
                 api.load_list()
         except:
-            return {"code": 0, "msg": "error;"}
+            return {"code": 0, "msg": "error"}
         return {"code": 1, "msg": "done"}

@@ -1,49 +1,33 @@
 # coding=utf-8
-# pylint: disable=relative-beyond-top-level
-from ..platform import CMDProcessor
-from flask import jsonify
-import time
+
+from altfe.interface.root import interRoot
 
 
-@CMDProcessor.plugin_register("api/get/list")
-class get_list(object):
-    def __init__(self, MOD):
-        self.MOD = MOD
-
-    def pRun(self, cmd):
+@interRoot.bind("api/get/list/", "PLUGIN")
+class get_list(interRoot):
+    def run(self, cmd):
         try:
-            argv = self.MOD.args.gets(["id=None"])
+            argv = self.STATIC.arg.gets(["id={_none}", "password={_blank}"], "POST")
         except:
-            return jsonify({"code": 0, "msg": "missing parameters"}), 400
+            return {"code": 0, "msg": "bad request or missing parameters"}
 
-        filePath = [x for x in cmd[12:].split("/") if x != ""]
+        filePath = [x for x in cmd.split("/") if x != ""]
         numOfpath = len(filePath)
         apis = []
         api = None
 
         # 列出所有 api
-        for name in dir(self.MOD):
+        for name in dir(self.CORE):
             if "cloud_" in name:
-                apis.append(getattr(self.MOD, name))
+                apis.append(getattr(self.CORE, name))
 
         # 返回全部列表
         if numOfpath == 0:
-            # 如果有线程正在更新，则阻塞
-            # trysum = 0
-            # while True:
-            #     status = [x.inCheck for x in apis]
-            #     if not True in status or trysum > 10:
-            #         break
-            #     trysum += 1
-            #     time.sleep(0.5)
             r = {}
             for x in apis:
                 for u in x.list:
-                    r[u] = x.list[u]
-            return {
-                "code": 1,
-                "msg": r,
-            }
+                    r[u] = x.locateAll(u)
+            return {"code": 1, "msg": r, }
 
         user = filePath[0]
         # 确定具体 api
@@ -52,35 +36,21 @@ class get_list(object):
                 api = func
                 break
 
-        if api == None:
-            return jsonify({"code": 0, "msg": "unknown user"}), 400
-
-        # 如果线程正在更新，则阻塞
-        # trysum = 0
-        # while True:
-        #     if api.inCheck == False or trysum > 10:
-        #         break
-        #     trysum += 1
-        #     time.sleep(0.5)
+        if api is None:
+            return {"code": 0, "msg": "unknown user"}
 
         if numOfpath == 1:
-            r = {}
-            for u in api.list:
-                r[u] = api.list[u]
-            return {
-                "code": 1,
-                "msg": r,
-            }
-        else:
-            if argv["id"] != "None":
+            if argv["id"] is not None:
                 fId = argv["id"]
-                file = api.locate_id(user, fId)
+                r = api.locate_id(user, fId, [x for x in argv["password"].split("._.") if x != ""])
             else:
-                file = api.locate(user, filePath)
-            if file:
-                return {
-                    "code": 1,
-                    "msg": file,
-                }
+                r = {}
+                for u in api.list:
+                    r[u] = api.locateAll(u)
+        else:
+            r = api.locate(user, filePath, [x for x in argv["password"].split("._.") if x != ""])
 
-        return "404 Not Found.", 404
+        if r:
+            return {"code": 1, "msg": r, }
+
+        return {"code": 404, "msg": "404 Not Found."}

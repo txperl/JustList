@@ -1,0 +1,53 @@
+# 天翼云盘配置项
+
+accounts:
+  # 天翼云盘账号
+  # 可输入多组账号，但自定义名称不可相同
+  #
+  # 请参考如下格式填写：
+  # <自定义名称>:
+  #   - "<your_username>"
+  #   - "<your_password>"
+  #
+  # 例子（注意缩进）：
+  # Cloud189_User1:
+  #   - "abc@e.com"
+  #   - "123456"
+  # Cloud189_User2:
+  #   - "def@e.com"
+  #   - "654321"
+  Cloud189_User1:
+    - "<your_username>"
+    - "<your_password>"
+  Cloud189_User2:
+    - "<your_username>"
+    - "<your_password>"
+
+cant_enterFolder:
+  # 加载目录时排除的文件夹名，正则 match
+  - ".*?\\._\\.jl"
+  - "同步盘"
+  - "我的.."
+
+cant_visFile:
+  # 加载目录时排除的文件名，正则 match
+  - ".*?\\._\\.jl"
+  - "\\..*?"
+
+rootPath: "/"
+# 根目录
+
+sys_checkTime: 60
+# 程序自检任务时间间隔（秒，下同）
+
+sys_tokenExpiredTime: 3600
+# token 缓存有效时间
+
+sys_dataExpiredTime: 900
+# 文件目录缓存有效时间
+
+sys_dl_urlExpiredNum: 35
+# 下载链接缓存的有效次数
+
+sys_dl_urlExpiredTime: 300
+# 下载链接缓存的有效时间

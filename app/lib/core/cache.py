@@ -1,33 +1,33 @@
 # coding=utf-8
-# pylint: disable=relative-beyond-top-level,unused-wildcard-import
-from ...platform import CMDProcessor
-import threading
+
 import base64
 import pickle
+import threading
 import time
 
+from altfe.interface.root import interRoot
 
-@CMDProcessor.core_register_auto("cache")
+
+@interRoot.bind("cache", "LIB_CORE")
 class core_module_cache(object):
-    def __init__(self, info):
+    def __init__(self):
         self._check_time = 5
         self._cache = {}
         self.lock = threading.Lock()
+        self.auto()
 
     def auto(self):
         t = threading.Timer(0, self.__check)
         t.setDaemon(True)
         t.start()
         print("[cache] running")
-        return self
 
     def set(self, key: str, value, expire=600, reset=True):
         self.lock.acquire()
         try:
             assert key != ""
-            if key in self._cache:
-                assert reset == True
-                assert self.delete(key) == True
+            if key in self._cache and reset is not True:
+                return True
             self._cache[key] = {}
             if not isinstance(value, bytes):
                 self._cache[key]["bytes"] = 0
@@ -45,7 +45,7 @@ class core_module_cache(object):
             self.lock.release()
         return True
 
-    def get(self, key: str, itype="value"):
+    def get(self, key: str, itype="value", forceIncrement=False):
         try:
             assert key != "" and key in self._cache
             if itype == "value":
@@ -55,6 +55,8 @@ class core_module_cache(object):
                 self._cache[key]["visnum"] += 1
             else:
                 value = self._cache[key][itype]
+                if forceIncrement:
+                    self._cache[key]["visnum"] += 1
             return value
         except:
             return None

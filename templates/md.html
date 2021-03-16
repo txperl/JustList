@@ -3,13 +3,14 @@
     GitHub: https://github.com/txperl/JustList
 -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JustList</title>
 
+    <link rel="icon" href="data:;base64,=">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.css">
     <style>
@@ -34,10 +35,16 @@
             outline: none;
         }
 
+        .mdui-typo blockquote a {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
         .text-item {
             border: 2px solid rgba(0, 0, 0, .12) !important;
             border-radius: 10px;
-            padding: 2em;
+            padding: 1em 2em;
         }
 
         .mdui-card {
@@ -69,6 +76,10 @@
             box-shadow: none;
         }
 
+        .ani-spin {
+            animation: mdui-spinner 1568ms linear infinite;
+        }
+
         #loading {
             width: 100%;
             height: 100%;
@@ -88,51 +99,51 @@
 </head>
 
 <body class="mdui-appbar-with-toolbar">
-<div id="loading">
-    <img src="data:image/svg+xml;base64,PCEtLSBCeSBTYW0gSGVyYmVydCAoQHNoZXJiKSwgZm9yIGV2ZXJ5b25lLiBNb3JlIEAgaHR0cDovL2dvby5nbC83QUp6YkwgLS0+Cjxzdmcgd2lkdGg9IjE0MCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDE0MCA2NCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJwaW5rIj4KICAgIDxwYXRoIGQ9Ik0zMC4yNjIgNTcuMDJMNy4xOTUgNDAuNzIzYy01Ljg0LTMuOTc2LTcuNTYtMTIuMDYtMy44NDItMTguMDYzIDMuNzE1LTYgMTEuNDY3LTcuNjUgMTcuMzA2LTMuNjhsNC41MiAzLjc2IDIuNi01LjI3NGMzLjcxNy02LjAwMiAxMS40Ny03LjY1IDE3LjMwNS0zLjY4IDUuODQgMy45NyA3LjU2IDEyLjA1NCAzLjg0MiAxOC4wNjJMMzQuNDkgNTYuMTE4Yy0uODk3IDEuNTEyLTIuNzkzIDEuOTE1LTQuMjI4Ljl6IiBmaWxsLW9wYWNpdHk9Ii41Ij4KICAgICAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJmaWxsLW9wYWNpdHkiCiAgICAgICAgICAgICBiZWdpbj0iMHMiIGR1cj0iMS40cyIKICAgICAgICAgICAgIHZhbHVlcz0iMC41OzE7MC41IgogICAgICAgICAgICAgY2FsY01vZGU9ImxpbmVhciIKICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTEwNS41MTIgNTYuMTJsLTE0LjQ0LTI0LjI3MmMtMy43MTYtNi4wMDgtMS45OTYtMTQuMDkzIDMuODQzLTE4LjA2MiA1LjgzNS0zLjk3IDEzLjU4OC0yLjMyMiAxNy4zMDYgMy42OGwyLjYgNS4yNzQgNC41Mi0zLjc2YzUuODQtMy45NyAxMy41OTItMi4zMiAxNy4zMDcgMy42OCAzLjcxOCA2LjAwMyAxLjk5OCAxNC4wODgtMy44NDIgMTguMDY0TDEwOS43NCA1Ny4wMmMtMS40MzQgMS4wMTQtMy4zMy42MS00LjIyOC0uOXoiIGZpbGwtb3BhY2l0eT0iLjUiPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9ImZpbGwtb3BhY2l0eSIKICAgICAgICAgICAgIGJlZ2luPSIwLjdzIiBkdXI9IjEuNHMiCiAgICAgICAgICAgICB2YWx1ZXM9IjAuNTsxOzAuNSIKICAgICAgICAgICAgIGNhbGNNb2RlPSJsaW5lYXIiCiAgICAgICAgICAgICByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICAgIDwvcGF0aD4KICAgIDxwYXRoIGQ9Ik02Ny40MDggNTcuODM0bC0yMy4wMS0yNC45OGMtNS44NjQtNi4xNS01Ljg2NC0xNi4xMDggMC0yMi4yNDggNS44Ni02LjE0IDE1LjM3LTYuMTQgMjEuMjM0IDBMNzAgMTYuMTY4bDQuMzY4LTUuNTYyYzUuODYzLTYuMTQgMTUuMzc1LTYuMTQgMjEuMjM1IDAgNS44NjMgNi4xNCA1Ljg2MyAxNi4wOTggMCAyMi4yNDdsLTIzLjAwNyAyNC45OGMtMS40MyAxLjU1Ni0zLjc1NyAxLjU1Ni01LjE4OCAweiIgLz4KPC9zdmc+Cg=="
-         alt="loading"/>
-</div>
-<div id="main-part" style="display: none;">
-    <div id="file-list" class="mdui-container" style="margin-top: 20px; margin-bottom: 30px;">
-        <div class="mdui-card">
-            <!-- 卡片的内容 -->
-            <div class="mdui-card-content">
-                <!-- 头 -->
-                <div style="padding: 8px 5px 12px 5px;">
-                    <!-- 用户选择菜单 -->
-                    <ul class="mdui-menu" id="choose_user">
-                        <li v-for="x in more.users" class="mdui-menu-item">
-                            <a v-on:click="go_hash('/list/' + x + '/-11'); change_type('list')"
-                               class="mdui-ripple">[[ x
-                                ]]</a>
-                        </li>
-                        <li class="mdui-menu-item">
-                            <a target="_blank" href="https://github.com/txperl/JustList"
-                               class="mdui-ripple">GitHub@JustList</a>
-                        </li>
-                    </ul>
-                    <!-- 用户选择器 -->
-                    <div class="mdui-chip" mdui-menu="{target: '#choose_user', subMenuTrigger: 'hover'}">
+    <div id="loading">
+        <img src="data:image/svg+xml;base64,PCEtLSBCeSBTYW0gSGVyYmVydCAoQHNoZXJiKSwgZm9yIGV2ZXJ5b25lLiBNb3JlIEAgaHR0cDovL2dvby5nbC83QUp6YkwgLS0+Cjxzdmcgd2lkdGg9IjE0MCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDE0MCA2NCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJwaW5rIj4KICAgIDxwYXRoIGQ9Ik0zMC4yNjIgNTcuMDJMNy4xOTUgNDAuNzIzYy01Ljg0LTMuOTc2LTcuNTYtMTIuMDYtMy44NDItMTguMDYzIDMuNzE1LTYgMTEuNDY3LTcuNjUgMTcuMzA2LTMuNjhsNC41MiAzLjc2IDIuNi01LjI3NGMzLjcxNy02LjAwMiAxMS40Ny03LjY1IDE3LjMwNS0zLjY4IDUuODQgMy45NyA3LjU2IDEyLjA1NCAzLjg0MiAxOC4wNjJMMzQuNDkgNTYuMTE4Yy0uODk3IDEuNTEyLTIuNzkzIDEuOTE1LTQuMjI4Ljl6IiBmaWxsLW9wYWNpdHk9Ii41Ij4KICAgICAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJmaWxsLW9wYWNpdHkiCiAgICAgICAgICAgICBiZWdpbj0iMHMiIGR1cj0iMS40cyIKICAgICAgICAgICAgIHZhbHVlcz0iMC41OzE7MC41IgogICAgICAgICAgICAgY2FsY01vZGU9ImxpbmVhciIKICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTEwNS41MTIgNTYuMTJsLTE0LjQ0LTI0LjI3MmMtMy43MTYtNi4wMDgtMS45OTYtMTQuMDkzIDMuODQzLTE4LjA2MiA1LjgzNS0zLjk3IDEzLjU4OC0yLjMyMiAxNy4zMDYgMy42OGwyLjYgNS4yNzQgNC41Mi0zLjc2YzUuODQtMy45NyAxMy41OTItMi4zMiAxNy4zMDcgMy42OCAzLjcxOCA2LjAwMyAxLjk5OCAxNC4wODgtMy44NDIgMTguMDY0TDEwOS43NCA1Ny4wMmMtMS40MzQgMS4wMTQtMy4zMy42MS00LjIyOC0uOXoiIGZpbGwtb3BhY2l0eT0iLjUiPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9ImZpbGwtb3BhY2l0eSIKICAgICAgICAgICAgIGJlZ2luPSIwLjdzIiBkdXI9IjEuNHMiCiAgICAgICAgICAgICB2YWx1ZXM9IjAuNTsxOzAuNSIKICAgICAgICAgICAgIGNhbGNNb2RlPSJsaW5lYXIiCiAgICAgICAgICAgICByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICAgIDwvcGF0aD4KICAgIDxwYXRoIGQ9Ik02Ny40MDggNTcuODM0bC0yMy4wMS0yNC45OGMtNS44NjQtNi4xNS01Ljg2NC0xNi4xMDggMC0yMi4yNDggNS44Ni02LjE0IDE1LjM3LTYuMTQgMjEuMjM0IDBMNzAgMTYuMTY4bDQuMzY4LTUuNTYyYzUuODYzLTYuMTQgMTUuMzc1LTYuMTQgMjEuMjM1IDAgNS44NjMgNi4xNCA1Ljg2MyAxNi4wOTggMCAyMi4yNDdsLTIzLjAwNyAyNC45OGMtMS40MyAxLjU1Ni0zLjc1NyAxLjU1Ni01LjE4OCAweiIgLz4KPC9zdmc+Cg=="
+            alt="loading" />
+    </div>
+    <div id="main-part" style="display: none;">
+        <div id="file-list" class="mdui-container" style="margin-top: 20px; margin-bottom: 30px;">
+            <div class="mdui-card">
+                <!-- 卡片的内容 -->
+                <div class="mdui-card-content">
+                    <!-- 头 -->
+                    <div style="padding: 8px 5px 12px 5px;">
+                        <!-- 用户选择菜单 -->
+                        <ul class="mdui-menu" id="choose_user">
+                            <li v-for="x in more.users" class="mdui-menu-item">
+                                <a v-on:click="go_hash('/list/' + x + '/-11'); change_type('list')"
+                                    class="mdui-ripple">[[ x
+                                    ]]</a>
+                            </li>
+                            <li class="mdui-menu-item">
+                                <a target="_blank" href="https://github.com/txperl/JustList"
+                                    class="mdui-ripple">GitHub@JustList</a>
+                            </li>
+                        </ul>
+                        <!-- 用户选择器 -->
+                        <div class="mdui-chip" mdui-menu="{target: '#choose_user', subMenuTrigger: 'hover'}">
                             <span class="mdui-chip-icon" mdui-tooltip="{content: '用户切换', position: 'top'}">
                                 <i class="mdui-icon material-icons">face</i>
                             </span>
-                    </div>
-                    <!-- 首页头按钮 -->
-                    <div v-on:click="go_hash('/list/' + more._u + '/-11'); change_type('list')" class="mdui-chip"
-                         style="margin: 2px 0 2px -32px; text-align: right;">
+                        </div>
+                        <!-- 首页头按钮 -->
+                        <div v-on:click="go_hash('/list/' + more._u + '/-11'); change_type('list')" class="mdui-chip"
+                            style="margin: 2px 0 2px -32px; text-align: right;">
                             <span v-if="more._t != 'search'" style="margin-left:25px;" class="mdui-chip-title">[[
                                 more._u ]]
                                 ~</span>
-                        <span v-if="more._t == 'search'" style="margin-left:25px;"
-                              class="mdui-chip-title">退出搜索</span>
-                    </div>
-                    <!-- 搜索头按钮 -->
-                    <div v-if="more._t == 'search'" v-on:click="go_hash('/search/' + encodeURI(more._s))"
-                         class="mdui-chip" style=" text-align: right;">
-                        <span class="mdui-chip-title">「[[ more._s ]]」~</span>
-                    </div>
-                    <!-- 路径 -->
-                    <span v-for="x in paths" v-if="x.id != -11">
+                            <span v-if="more._t == 'search'" style="margin-left:25px;"
+                                class="mdui-chip-title">退出搜索</span>
+                        </div>
+                        <!-- 搜索头按钮 -->
+                        <div v-if="more._t == 'search'" v-on:click="go_hash('/search/' + encodeURI(more._s))"
+                            class="mdui-chip" style=" text-align: right;">
+                            <span class="mdui-chip-title">「[[ more._s ]]」~</span>
+                        </div>
+                        <!-- 路径 -->
+                        <span v-for="x in paths" v-if="x.id != -11">
                             <span style="color:rgba(0,0,0,.87);">
                                 &nbsp;&gt;&nbsp;
                             </span>
@@ -140,124 +151,148 @@
                                 <span class="mdui-chip-title">[[ x.name ]]</span>
                             </div>
                         </span>
-                </div>
+                    </div>
 
-                <ul class="mdui-list">
-                    <!-- 功能按键 -->
-                    <li class="mdui-list-item">
-                        <div class="mdui-list-item-content">
-                            <div class="mdui-list-item-title">
-                                <!-- 搜索 -->
-                                <div class="mdui-textfield mdui-textfield-expandable mdui-float-right">
-                                    <button class="mdui-textfield-icon mdui-btn mdui-btn-icon"><i
-                                            class="mdui-icon material-icons">search</i></button>
-                                    <input v-model="more._s"
-                                           v-on:keyup="go_hash('/search/' + encodeURI(more._s.replace('/','')))"
-                                           class="mdui-textfield-input" type="text"
-                                           placeholder="请输入想要搜索的关键词（支持正则表达式）"/>
-                                    <button v-on:click="change_type('list')"
+                    <ul class="mdui-list">
+                        <!-- 功能按键 -->
+                        <li class="mdui-list-item">
+                            <div class="mdui-list-item-content">
+                                <div class="mdui-list-item-title">
+                                    <!-- 搜索 -->
+                                    <div class="mdui-textfield mdui-textfield-expandable mdui-float-right">
+                                        <button class="mdui-textfield-icon mdui-btn mdui-btn-icon"><i
+                                                class="mdui-icon material-icons">search</i></button>
+                                        <input v-model="more._s"
+                                            v-on:keyup="go_hash('/search/' + encodeURI(more._s.replace('/','')))"
+                                            class="mdui-textfield-input" type="text"
+                                            placeholder="请输入想要搜索的关键词（支持正则表达式）" />
+                                        <button v-on:click="change_type('list')"
                                             class="mdui-textfield-close mdui-btn mdui-btn-icon"
                                             mdui-tooltip="{content: '退出搜索'}">
-                                        <i class="mdui-icon material-icons">close</i>
-                                    </button>
-                                </div>
-                                <!-- 返回 -->
-                                <button v-on:click="go_back(1)" class="mdui-btn mdui-btn-icon"><i
-                                        class="mdui-icon material-icons">arrow_back</i></button>
-                                <!-- 刷新 -->
-                                <button v-on:click="refresh()" class="mdui-btn mdui-btn-icon"
+                                            <i class="mdui-icon material-icons">close</i>
+                                        </button>
+                                    </div>
+                                    <!-- 返回 -->
+                                    <button v-on:click="go_back(1)" class="mdui-btn mdui-btn-icon"><i
+                                            class="mdui-icon material-icons">arrow_back</i></button>
+                                    <!-- 刷新 -->
+                                    <button v-on:click="refresh()" class="mdui-btn mdui-btn-icon"
                                         mdui-tooltip="{content: '刷新本地缓存'}"><i
-                                        class="mdui-icon material-icons">refresh</i></button>
-                                <!-- 图片浏览模式 -->
-                                <button v-on:click="show('img', '#list_imgs')" class="mdui-btn mdui-btn-icon"
+                                            class="mdui-icon material-icons">refresh</i></button>
+                                    <!-- 图片浏览模式 -->
+                                    <button v-on:click="viewer_show('img', '#list_imgs')" class="mdui-btn mdui-btn-icon"
                                         mdui-tooltip="{content: '浏览本页所有图片'}"><i
-                                        class="mdui-icon material-icons">panorama_wide_angle</i></button>
-                                <!-- 下一项 -->
-                                <button v-if="more._f.next != ''"
+                                            class="mdui-icon material-icons">panorama_wide_angle</i></button>
+                                    <!-- 下一项 -->
+                                    <button v-if="more._f.next != ''"
                                         v-on:click="go_hash('/list/' + more._u + '/' + more._f.next)"
                                         class="mdui-btn mdui-btn-icon"><i
-                                        class="mdui-icon material-icons">keyboard_arrow_down</i></button>
-                                <!-- 上一项 -->
-                                <button v-if="more._f.prev != ''"
+                                            class="mdui-icon material-icons">keyboard_arrow_down</i></button>
+                                    <!-- 上一项 -->
+                                    <button v-if="more._f.prev != ''"
                                         v-on:click="go_hash('/list/' + more._u + '/' + more._f.prev)"
                                         class="mdui-btn mdui-btn-icon"><i
-                                        class="mdui-icon material-icons">keyboard_arrow_up</i></button>
+                                            class="mdui-icon material-icons">keyboard_arrow_up</i></button>
+                                </div>
                             </div>
-                        </div>
-                    </li>
-                    <!-- 文件列表 -->
-                    <li v-for="file in sort_array(files)"
-                        v-on:click="go_click_hash($event, '/list/' + file.user + '/' + file.fileId)"
-                        class="mdui-list-item mdui-ripple">
-                        <div class="mdui-list-item-content">
-                            <div class="mdui-list-item-title">
-                                <i v-if="in_support(file)" class="mdui-icon material-icons"
-                                   style="margin: -3px 5px 0 0;">[[in_support(file)]]</i> [[file.fileName ]]
-                                <span v-if="more._t == 'search'" style="color: rgba(0, 0, 0, 0.5);
+                        </li>
+                        <!-- 文件列表 -->
+                        <li v-for="file in sort_array(files)"
+                            v-on:click="go_click_hash($event, '/list/' + file.user + '/' + file.fileId)"
+                            class="mdui-list-item mdui-ripple">
+                            <div class="mdui-list-item-content">
+                                <div class="mdui-list-item-title">
+                                    <i v-if="in_support(file)" class="mdui-icon material-icons"
+                                        style="margin: -3px 5px 0 0;">[[in_support(file)]]</i> [[file.fileName ]]
+                                    <span v-if="more._t == 'search'" style="color: rgba(0, 0, 0, 0.5);
                                 font-size: 12px;"> @[[ file.user ]]</span>
-                                <!-- 下载按钮 -->
-                                <i v-if="file.isFolder == false"
-                                   v-on:click="go('/file/' + file.user + '/?id=' + file.fileId, true)"
-                                   class="mdui-float-right mdui-icon material-icons"
-                                   style="color: rgba(0,0,0,.54);">file_download</i>
-                            </div>
-                            <div v-if="file.isFolder == false" class="mdui-list-item-text"
-                                 :class="{'mdui-list-item-one-line': more._t != 'search', 'mdui-list-item-two-line': more._t == 'search'}">
-                                [[ file.fileSize ]] / [[ file.lastOpTime ]]
-                                <span v-if="more._t == 'search'" style="font-weight: 600;"><br>[[ file.filePath
+                                    <!-- 下载按钮 -->
+                                    <i v-if="file.isFolder == false && !file.filePassword"
+                                        v-on:click="go('/file/' + file.user + '/?id=' + file.fileId, true)"
+                                        class="mdui-float-right mdui-icon material-icons"
+                                        style="color: rgba(0,0,0,.54);">file_download</i>
+                                    <i v-if="file.isFolder == false && file.filePassword"
+                                        v-on:click="go('/file/' + file.user + '/?id=' + file.fileId + '&password=' + file.filePassword, true)"
+                                        class="mdui-float-right mdui-icon material-icons"
+                                        style="color: rgba(0,0,0,.54);">file_download</i>
+                                </div>
+                                <div v-if="file.isFolder == false" class="mdui-list-item-text"
+                                    :class="{'mdui-list-item-one-line': more._t != 'search', 'mdui-list-item-two-line': more._t == 'search'}">
+                                    [[ file.fileSize ]] / [[ file.lastOpTime ]]
+                                    <span v-if="more._t == 'search'" style="font-weight: 600;"><br>[[ file.filePath
                                         ]]</span>
+                                </div>
                             </div>
+                        </li>
+                    </ul>
+                    <!-- 密码输入面板 -->
+                    <div v-if="more._f.isFolder && more._f.isSecret && !more._f.isUnlock" class="mdui-card-media"
+                        style="margin: auto; width: 350px; max-width: 100%;">
+                        <div class="mdui-textfield mdui-textfield-floating-label">
+                            <i id="inpsw-icon-lock" class="mdui-icon material-icons">lock</i>
+                            <label class="mdui-textfield-label">Password to Unlock</label>
+                            <input id="input-password" class="mdui-textfield-input"
+                                style="border-bottom: 1px solid rgba(0, 0, 0, .42); width: calc(100% - 95px);"
+                                type="password"
+                                @keyup.enter="get_secretList(more._u, more._f.fileId, $('#input-password').val())" />
+                            <a v-on:click="get_secretList(more._u, more._f.fileId, $('#input-password').val())"
+                                class="mdui-btn mdui-btn-icon mdui-icon" style="right: 0;"><i
+                                    class="mdui-icon material-icons" style="padding: 0;">keyboard_arrow_right</i></a>
                         </div>
-                    </li>
-                </ul>
-                <!-- 固定标签 -->
-                <div v-if="more._f.isFolder == false" class="mdui-typo">
-                    <blockquote>
-                        名称：[[ more._f.fileName ]]<br>
-                        大小：[[ more._f.fileSize ]]<br>
-                        日期：[[ more._f.lastOpTime ]]<br>
-                        用户：[[ more._f.user ]]<br>
-                        链接：
-                        <ul>
-                            <li><a :href="api_url + '/file/' + more._u + '/?id=' + more._f.fileId">[[
-                                api_url ]]/file/[[ more._u ]]/?id=[[ more._f.fileId ]]</a></li>
-                            <li><a :href="api_url + '/file/' + more._u + get_full_path(paths)">[[
-                                api_url ]]/file/[[ more._u ]][[ get_full_path(paths) ]]</a></li>
-                        </ul>
-                    </blockquote>
-                    <br>
-                </div>
-                <!-- 卡片的媒体内容 -->
-                <div v-if="more._f.isFolder == false" class="mdui-card-media" style="margin: 8px -16px;">
-                    <div class="mdui-typo">
-                        <!-- 图片 -->
-                        <img v-viewer="{navbar: false}" v-if="in_support(more._f, 'img')"
-                             v-lazy="api_url + '/file/' + more._u + '/?id=' + more._f.fileId"/>
-                        <!-- 视频 -->
-                        <video v-else-if="in_support(more._f, 'video')"
-                               :src="api_url + '/file/' + more._u + '/?id=' + more._f.fileId"
-                               controls="controls"></video>
-                        <!-- 音频 -->
-                        <audio v-else-if="in_support(more._f, 'audio')"
-                               :src="api_url + '/file/' + more._u + '/?id=' + more._f.fileId"
-                               controls="controls"></audio>
-                        <!-- 文本 -->
-                        <textarea v-else-if="more._f.fileType !='md' && in_support(more._f, 'text')"
-                                  :value="more._f.data" class="mdui-textfield-input text-item" rows="12"
-                                  readonly></textarea>
-                        <!-- markdown -->
-                        <vue-markdown v-else-if="more._f.fileType == 'md'" :source="more._f.data" class="text-item">
-                        </vue-markdown>
                     </div>
-                </div>
-                <div id="list_imgs" class="images" v-viewer="{url: 'data-source'}">
-                    <img v-for="file in files" v-if="in_support(file, 'img')"
-                         :data-source="api_url + '/file/' + more._u + '/?id=' + file.fileId">
+                    <!-- 固定标签 -->
+                    <div v-if="more._f.isFolder == false" class="mdui-typo">
+                        <blockquote>
+                            名称：[[ more._f.fileName ]]<br>
+                            大小：[[ more._f.fileSize ]]<br>
+                            日期：[[ more._f.lastOpTime ]]<br>
+                            用户：[[ more._f.user ]]<br>
+                            权限：[[ more._f.filePassword ? '私密' : '公开' ]]<br>
+                            链接：
+                            <ul>
+
+                                <li><a :href="more._f.fileMaybeURL">[[more._f.fileMaybeURL]]</a>
+                                </li>
+                                <li><a v-if="!more._f.filePassword"
+                                        :href="api_url + '/file/' + more._u + get_full_path(paths)">[[
+                                        api_url ]]/file/[[ more._u ]][[ get_full_path(paths) ]]</a>
+                                    <a v-if="more._f.filePassword"
+                                        :href="api_url + '/file/' + more._u + get_full_path(paths) + '?password=' + more._f.filePassword">[[
+                                        api_url ]]/file/[[ more._u ]][[ get_full_path(paths) ]]?password=[[
+                                        more._f.filePassword ]]</a>
+                                </li>
+                            </ul>
+                        </blockquote>
+                        <br>
+                    </div>
+                    <!-- 卡片的媒体内容 -->
+                    <div v-if="more._f.isFolder == false" class="mdui-card-media" style="margin: 8px -16px;">
+                        <div class="mdui-typo">
+                            <!-- 图片 -->
+                            <img v-viewer="{navbar: false}" v-if="in_support(more._f, 'img')"
+                                v-lazy="more._f.fileMaybeURL" />
+                            <!-- 视频 -->
+                            <video v-else-if="in_support(more._f, 'video')" :src="more._f.fileMaybeURL"
+                                controls="controls"></video>
+                            <!-- 音频 -->
+                            <audio v-else-if="in_support(more._f, 'audio')" :src="more._f.fileMaybeURL"
+                                controls="controls"></audio>
+                            <!-- 文本 -->
+                            <textarea v-else-if="more._f.fileType !='md' && in_support(more._f, 'text')"
+                                :value="more._f.data" class="mdui-textfield-input text-item" rows="12"
+                                readonly></textarea>
+                            <!-- markdown -->
+                            <vue-markdown v-else-if="more._f.fileType == 'md'" :source="more._f.data" class="text-item">
+                            </vue-markdown>
+                        </div>
+                    </div>
+                    <div id="list_imgs" class="images" v-viewer="{url: 'data-source', hidden: viewer_onHidden}">
+                        <img v-for="url in more._viewer" :data-source="url">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 
 <footer>
@@ -269,8 +304,9 @@
     <script src="//cdn.jsdelivr.net/npm/vue-lazyload@1.3.3/vue-lazyload.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/v-viewer@1.5.1/dist/v-viewer.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
     <script>
-        version = 1;
+        version = 2;
         tmp = {}; // 全局暂留
 
         Vue.use(VueLazyload, {
@@ -283,16 +319,18 @@
         app = new Vue({
             el: '#file-list',
             data: {
-                paths: [{id: -11, name: "~"}],
+                paths: [{ id: -11, name: "~" }],
                 files: [],
                 temp: {
-                    _f: {"fileSize": 0, "isFolder": true, "data": "", "next": "", "prev": ""}
+                    _salt: "",
+                    _f: { "fileSize": 0, "isFolder": true, "data": "", "next": "", "prev": "" }
                 },
                 more: {
                     _u: "", // 当前用户
                     _f: "", // 当前路径信息
                     _t: "list", // 当前操作类型
                     _s: "", // 当前搜索关键词
+                    _viewer: [], // viewerjs 数据
                     _tmp: "", // 保留关键词
                     users: [], // 全部用户
                     format_support: { // 格式支持，index=0 为显示的图标，其余为相应的文件后缀
@@ -312,13 +350,16 @@
             created: function () {
                 // 获取数据
                 let data = localStorage.getItem("cloud_list");
+                const salt = localStorage.getItem("cloud_salt");
                 const outdated = localStorage.getItem("cloud_outdated");
                 const tmpversion = localStorage.getItem("cloud_version");
-                if (data == null || outdated == null || tmpversion == null || tmpversion < version || outdated <= Date.parse(new Date())) {
+                if (data == null || salt == null || outdated == null || tmpversion == null || tmpversion < version || outdated <= Date.parse(new Date())) {
+                    localStorage.clear();
                     const vm = this;
-                    axios.get(this.api_url + "/api/get/list")
+                    axios.post(`${this.api_url}/api/get/list/`, {})
                         .then(function (rep) {
-                            localStorage.setItem('cloud_list', JSON.stringify(rep["data"]));
+                            localStorage.setItem('cloud_list', JSON.stringify(rep["data"]["msg"]));
+                            localStorage.setItem('cloud_salt', dcodeIO.bcrypt.genSaltSync(10));
                             localStorage.setItem('cloud_outdated', Date.parse(new Date()) + 600000);
                             localStorage.setItem('cloud_version', version);
                             data = localStorage.getItem("cloud_list");
@@ -351,8 +392,6 @@
                     // 加载数据
                     try {
                         data = JSON.parse(data);
-                        if (data["code"] !== 1 || Object.keys(data["msg"]).length === 0)
-                            throw new Error();
                     } catch (e) {
                         console.log(e);
                         mdui.snackbar({
@@ -365,9 +404,10 @@
                             }
                         });
                     }
-                    vm.file_list_data = data["msg"];
-                    vm.more._u = Object.keys(data["msg"])[0];
-                    vm.more.users = Object.keys(data["msg"]);
+                    vm.file_list_data = data;
+                    vm.temp._salt = localStorage.getItem("cloud_salt");
+                    vm.more._u = Object.keys(data)[0];
+                    vm.more.users = Object.keys(data);
                 },
                 go_click_hash: function (event, hash) {
                     if (event.target.className !== "mdui-float-right mdui-icon material-icons") {
@@ -427,14 +467,73 @@
                     }
                     return ["", ""];
                 },
-                show: function (type, id) {
+                get_secretList: function (user, fid, password) {
+                    $("#inpsw-icon-lock").addClass("ani-spin");
+                    const vm = this;
+                    password = dcodeIO.bcrypt.hashSync(password, vm.temp._salt)
+                    if (vm.more._f.filePassword)
+                        password = vm.more._f.filePassword + "._." + password
+                    axios.post(`${this.api_url}/api/get/list/${user}/`, { id: fid, password: password })
+                        .then(function (rep) {
+                            if (rep["data"]["msg"][0]["child"].length > 0) {
+                                let parentId = vm.more._f.parentId;
+                                if (vm.paths.length <= 2)
+                                    parentId = -11;
+                                let parent = vm.locate_id(user, parentId);
+                                for (let i = 0; i < parent.end.child.length; i++) {
+                                    let file = parent.end.child[i];
+                                    if (file.fileId === fid) {
+                                        file.child = rep["data"]["msg"][0]["child"];
+                                        file["filePassword"] = password;
+                                        file["isUnlock"] = true;
+                                        vm.add_listPassword(file.child, password);
+                                        break
+                                    }
+                                }
+                                localStorage.setItem('cloud_list', JSON.stringify(vm.file_list_data));
+                                vm.toPath(window.location.hash);
+                            } else {
+                                mdui.snackbar({ message: "密码错误，或此目录为空", timeout: 1500 });
+                            }
+                        })
+                        .catch(function (error) {
+                            console.log(error);
+                            mdui.snackbar({ message: "未知错误，请求或许已被系统限制", timeout: 1500 });
+                        })
+                        .finally(() => {
+                            $("#inpsw-icon-lock").removeClass("ani-spin");
+                        });
+                },
+                add_listPassword: function (li, password) {
+                    for (let i = 0; i < li.length; i++) {
+                        let file = li[i];
+                        if (file["isFolder"])
+                            this.add_listPassword(file["child"], password);
+                        else
+                            file["isUnlock"] = true;
+                        file["filePassword"] = password;
+                    }
+                },
+                viewer_show: function (type, id) {
+                    let r = [];
                     if (type === 'img') {
-                        if ($(id + ' img').length > 0) {
-                            $(id)[0].$viewer.reset()
-                            $(id)[0].$viewer.show()
-                            $(id)[0].$viewer.view(0)
+                        for (let i = 0; i < this.files.length; i++) {
+                            const file = this.files[i];
+                            if (this.in_support(file, 'img'))
+                                r.push(this.api_url + '/file/' + this.more._u + '/?id=' + file.fileId + (file.filePassword ? '&password=' + file.filePassword : ''))
                         }
                     }
+                    if (r.length > 0) {
+                        this.$set(this.more, '_viewer', r);
+                        $(id)[0].$viewer.reset();
+                        $(id)[0].$viewer.show();
+                        $(id)[0].$viewer.view(0);
+                    } else {
+                        this.viewer_onHidden();
+                    }
+                },
+                viewer_onHidden: function () {
+                    this.$set(this.more, '_viewer', []);
                 },
                 refresh: function () {
                     localStorage.clear();
@@ -480,7 +579,7 @@
                         r = arr.slice().sort(func);
                     } catch (e) {
                         console.log(e);
-                        r = {"Error": []};
+                        r = { "Error": [] };
                     }
                     return r;
                 },
@@ -498,7 +597,7 @@
                         const id = paths[3];
 
                         if (id === -11) {
-                            this.paths = [{id: -11, name: "~"}];
+                            this.paths = [{ id: -11, name: "~" }];
                             this.files = this.file_list_data[user];
                             this.more._u = user;
                             return;
@@ -516,7 +615,7 @@
                                 this.$set(this.more._f, "next", onetwo[1]);
                             } else if (type === 'file') {
                                 window.location.href = this.api_url + '/file/' + user + '/?id=' + id;
-                                this.paths = [{id: -11, name: "~"}];
+                                this.paths = [{ id: -11, name: "~" }];
                                 this.files = this.file_list_data[user];
                             }
                         } else {
@@ -535,7 +634,7 @@
                             this.more._s = key;
                         }
                     } else {
-                        this.paths = [{id: -11, name: "~"}];
+                        this.paths = [{ id: -11, name: "~" }];
                         const keys = Object.keys(this.file_list_data);
                         if (keys.indexOf(this.root_user) !== -1)
                             this.more._u = this.root_user;
@@ -544,19 +643,29 @@
                         this.files = this.file_list_data[this.more._u];
                     }
 
+                    this.more._f["fileMaybeURL"] = this.api_url + '/file/' + this.more._u + '/?id=' + this.more._f.fileId
+
+                    if (!this.more._f.isFolder && this.more._f.filePassword)
+                        this.more._f["fileMaybeURL"] += '&password=' + this.more._f.filePassword
+
                     // 加载 more._f 的文件内容（如果有）
                     if (!this.more._f["isFolder"] && this.more.format_support.text.indexOf(this.more._f["fileType"]) !== -1) {
                         const key = "cache_text_" + String(this.more._f["fileId"]);
                         const file = null;
                         // const file = localStorage.getItem(key);
                         if (file == null) {
-                            const url = this.api_url + "/api/get/text/" + this.more._f["user"] + "?id=" + this.more._f["fileId"];
                             const vm = this;
+                            let data = { id: this.more._f["fileId"] };
+                            if (this.more._f.filePassword)
+                                data["password"] = this.more._f.filePassword
                             vm.$set(vm.more._f, 'data', 'loading...');
-                            axios.get(url)
+                            axios.post(`${this.api_url}/api/get/text/${this.more._f["user"]}/`, data)
                                 .then(function (rep) {
                                     // localStorage.setItem(key, rep['data']);
                                     vm.$set(vm.more._f, 'data', rep['data']);
+                                })
+                                .catch(function (error) {
+                                    vm.$set(vm.more._f, 'data', ': ( 预览获取失败了');
                                 })
                         } else {
                             this.$set(this.more._f, "data", file);
@@ -569,12 +678,12 @@
                         tmp[fid] = true;
                         for (var file of arr) {
                             if (fid === file["fileId"]) {
-                                tmp.process.push({id: file["fileId"], name: file["fileName"]});
+                                tmp.process.push({ id: file["fileId"], name: file["fileName"] });
                                 tmp.end = file;
                                 return;
                             }
                             if (tmp.end == null && !(file["fileId"] in tmp)) {
-                                tmp.process.push({id: file["fileId"], name: file["fileName"]});
+                                tmp.process.push({ id: file["fileId"], name: file["fileName"] });
                                 pro_locate_id(file["child"], fid);
                                 if (tmp.end == null)
                                     tmp.process.pop();
@@ -585,9 +694,9 @@
 
                     if (!(user in this.file_list_data))
                         return false;
-                    tmp = {process: [{id: -11, name: "~"}], end: null};
+                    tmp = { process: [{ id: -11, name: "~" }], end: null };
                     if (Number(fid) === -11)
-                        tmp.end = {"child": this.file_list_data[user]};
+                        tmp.end = { "child": this.file_list_data[user] };
                     else
                         pro_locate_id(this.file_list_data[user], fid);
                     return tmp;
@@ -606,7 +715,7 @@
                     }
 
                     if (key === '')
-                        return {process: [{id: -11, name: key}], end: []};
+                        return { process: [{ id: -11, name: key }], end: [] };
                     key = new RegExp(key);
 
                     this.$data.more._t = 'search';
@@ -614,7 +723,7 @@
                     for (var user of Object.keys(this.file_list_data))
                         r = r.concat(pro_search(this.file_list_data[user], key));
                     return {
-                        process: [{id: -11, name: key}], end: r.sort(function (a, b) {
+                        process: [{ id: -11, name: key }], end: r.sort(function (a, b) {
                             return b["isFolder"] - a["isFolder"]
                         })
                     };

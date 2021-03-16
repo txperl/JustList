@@ -1,14 +1,10 @@
 import base64
 import hashlib
-import json
 import os
 import re
-import sys
-import time
 
 import requests
 import rsa
-from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 
 class cloud189(object):
@@ -111,20 +107,20 @@ class cloud189(object):
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.149 Safari/537.36",
             }
         )
-        if token != None:
+        if token is not None:
             try:
                 tmp = token.copy()
                 if "outdated" in token:
-                    del token["outdated"]
+                    del tmp["outdated"]
                 [
                     self.session.cookies.set(k, v, domain=".cloud.189.cn")
-                    for k, v in token.items()
+                    for k, v in tmp.items()
                 ]
                 r = self.session.get("https://cloud.189.cn/v2/getUserLevelInfo.action")
                 assert "InvalidSessionKey" not in r.text and "登陆框面板" not in r.text
-                return tmp
+                return token
             except:
-                print("[cloud189] cookie error, try to login")
+                print("[cloud189] token error, try to login")
                 self.session = requests.session()
                 self.session.headers.update(
                     {
@@ -149,7 +145,7 @@ class cloud189(object):
             },
         )
         msg = r.json()["msg"]
-        if "登录成功" == msg:
+        if msg == "登录成功":
             self.session.get(r.json()["toUrl"])
             return self.session.cookies.get_dict()
         else:
@@ -158,13 +154,13 @@ class cloud189(object):
 
     def get_file_size_str(self, filesize: int) -> str:
         if 0 < filesize < 1024 ** 2:
-            return f"{round(filesize/1024, 2)} KB"
+            return f"{round(filesize / 1024, 2)} KB"
         elif 1024 ** 2 < filesize < 1024 ** 3:
-            return f"{round(filesize/1024**2, 2)} MB"
+            return f"{round(filesize / 1024 ** 2, 2)} MB"
         elif 1024 ** 3 < filesize < 1024 ** 4:
-            return f"{round(filesize/1024**3, 2)} GB"
+            return f"{round(filesize / 1024 ** 3, 2)} GB"
         elif 1024 ** 4 < filesize < 1024 ** 5:
-            return f"{round(filesize/1024**4, 2)} TB"
+            return f"{round(filesize / 1024 ** 4, 2)} TB"
         else:
             return f"{filesize}Bytes"
 

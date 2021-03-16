@@ -1,11 +1,9 @@
 # -*- encoding: utf-8 -*-
 # Author:  MoeClub.org, github.com/txperl
 
-from urllib import request, error, parse
 import json
 import time
-import copy
-import os
+from urllib import request, error, parse
 
 clientId = [
     "78d4dc35-7e46-42c6-9023-2d39314433a5",
@@ -55,7 +53,7 @@ class Utils:
             return int(int(time.time()) - t)
 
     @staticmethod
-    def formatTime(s="", f="%Y/%m/%d %H:%M:%S"):
+    def formatTime(s="", f="%Y-%m-%d %H:%M:%S"):
         s_ = str(s)
         try:
             return time.strftime(f, time.strptime(s_, "%Y-%m-%dT%H:%M:%SZ"))
@@ -63,7 +61,7 @@ class Utils:
             try:
                 return time.strftime(f, time.strptime(s_, "%Y-%m-%dT%H:%M:%S.%fZ"))
             except:
-                return "unknow"
+                return "Unknown"
 
     @staticmethod
     def http(url, method="GET", headers=None, data=None, coding="utf-8", redirect=True):

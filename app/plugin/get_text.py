@@ -1,87 +1,62 @@
 # coding=utf-8
-# pylint: disable=relative-beyond-top-level
-from ..platform import CMDProcessor
-from urllib.parse import unquote
-from flask import jsonify, request
+
 import requests
-import time
-import re
+
+from altfe.interface.root import interRoot
 
 
-@CMDProcessor.plugin_register("api/get/text")
-class do_get_text(object):
-    def __init__(self, MOD):
-        self.MOD = MOD
-
-    def pRun(self, cmd):
+@interRoot.bind("api/get/text/", "PLUGIN")
+class do_get_text(interRoot):
+    def run(self, cmd):
         try:
-            argv = self.MOD.args.gets(["id=None"])
+            argv = self.STATIC.arg.gets(["id={_none}", "password={_blank}"], "POST")
         except:
-            return jsonify({"code": 0, "msg": "missing parameters"}), 400
+            return {"code": 0, "msg": "bad request or missing parameters"}
 
-        filePath = [x for x in cmd[12:].split("/") if x != ""]
+        filePath = [x for x in cmd.split("/") if x != ""]
         if len(filePath) == 0:
-            return jsonify({"code": 0, "msg": "missing parameters"}), 400
+            return {"code": 0, "msg": "missing parameters"}
         user = filePath[0]
         full = "/".join(filePath)
         api = None
 
         # 确定具体 api
-        for name in dir(self.MOD):
+        for name in dir(self.CORE):
             if "cloud_" in name:
-                tmp = getattr(self.MOD, name)
+                tmp = getattr(self.CORE, name)
                 if user in tmp.list:
                     api = tmp
                     break
 
-        if api == None:
-            return jsonify({"code": 0, "msg": "unknown user"}), 400
-
-        # 简单验证 Referrer
-        if len(api.conf["only_Referrer"]) != 0:
-            isc = False
-            for x in api.conf["only_Referrer"]:
-                if re.search(x, str(request.referrer)) != None:
-                    isc = True
-                    break
-            if isc == False:
-                return "Request Forbidden.", 403
-
-        # 如果有线程正在更新，则阻塞
-        # trysum = 0
-        # while True:
-        #     if api.inCheck == False or trysum > 10:
-        #         break
-        #     trysum += 1
-        #     time.sleep(0.5)
+        if api is None:
+            return {"code": 0, "msg": "unknown user"}
 
         finalUrl = None
 
         # 读取缓存
-        # key = argv["id"] if argv["id"] != "None" else full
-        # _link = [self.MOD.cache.get(user + "_" + key), self.MOD.cache.get(user + "_" + key, "visnum")]
-        # if _link[0] != None and _link[1] != None:
-        #     if _link[1] <= api.conf["sys_dl_urlExpiredNum"]:
-        #         finalUrl = _link[0]
-        #     else:
-        #         self.MOD.cache.delete(user + "_" + key)
+        key = self.STATIC.util.md5(full + str(argv["id"]) + str(argv["password"]))
+        _link = [self.CORE.cache.get(key), self.CORE.cache.get(key, "visnum"), self.CORE.cache.get(key + "_psw")]
+        if _link[0] is not None:
+            if _link[1] <= api.conf["sys_dl_urlExpiredNum"]:
+                if _link[2] == argv["password"]:
+                    finalUrl = _link[0]
 
         url = finalUrl
 
-        if url == None:
+        if url is None:
             # 检查权限与确定唯一 id
-            if argv["id"] != "None":
+            if argv["id"] is not None:
                 fId = argv["id"]
                 # 已有 id，但需要确定是否在文件列表中（是否可访问）
-                file = api.locate_id(user, fId)
-                if not file or (file["fileType"] != "txt" and file["fileType"] != "md"):
+                file = api.locate_id(user, fId, [x for x in argv["password"].split("._.") if x != ""])
+                if not file or (file[0]["fileType"] != "txt" and file[0]["fileType"] != "md"):
                     return "404 Not Found.", 404
             else:
                 # 已有文件在文件列表中的路径，需要确定唯一 id
-                file = api.locate(user, filePath)
-                if not file or (file["fileType"] != "txt" and file["fileType"] != "md"):
+                file = api.locate(user, filePath, [x for x in argv["password"].split("._.") if x != ""])
+                if not file or (file[0]["fileType"] != "txt" and file[0]["fileType"] != "md"):
                     return "404 Not Found.", 404
-                fId = file["fileId"]
+                fId = file[0]["fileId"]
             # 获取下载链接
             url = api.info(user, fId, True)
 
@@ -89,12 +64,9 @@ class do_get_text(object):
             try:
                 r = requests.get(url, timeout=10).text
                 if "此下载链接已过有效期" in r:
-                    print("Failed to Get. Try again.")
-                    r = requests.get(url, timeout=10).text
-                    if "此下载链接已过有效期" in r:
-                        return "Failed to Get."
+                    return "Failed to Get.", 500
                 return r
             except:
-                return "Failed."
+                return "Failed.", 500
         else:
-            return "Not a File."
+            return "Have no File.", 400
