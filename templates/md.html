@@ -76,6 +76,10 @@
             box-shadow: none;
         }
 
+        .mdui-appbar-with-toolbar {
+            padding: 56px 0;
+        }
+
         .ani-spin {
             animation: mdui-spinner 1568ms linear infinite;
         }
@@ -95,6 +99,12 @@
             transform: translateY(-50%) translateX(-50%);
             z-index: 999;
         }
+
+        @media (min-width: 600px) {
+            .mdui-appbar-with-toolbar {
+                padding: 64px 0;
+            }
+        }
     </style>
 </head>
 
@@ -111,7 +121,7 @@
                     <!-- 头 -->
                     <div style="padding: 8px 5px 12px 5px;">
                         <!-- 用户选择菜单 -->
-                        <ul class="mdui-menu" id="choose_user">
+                        <ul class="mdui-menu" id="choose_user" style="max-height: 100%;">
                             <li v-for="x in more.users" class="mdui-menu-item">
                                 <a v-on:click="go_hash('/list/' + x + '/-11'); change_type('list')"
                                     class="mdui-ripple">[[ x
@@ -566,7 +576,7 @@
                 },
                 sort_array: function (arr) {
                     function func(a, b) {
-                        if (a.isFolder || b.isFolder) return 0;
+                        if (a.isFolder || b.isFolder) return b.isFolder - a.isFolder;
                         const x1 = a.fileName;
                         const x2 = b.fileName;
                         if (x1 < x2) return -1;
