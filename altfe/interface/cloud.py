@@ -15,8 +15,7 @@ class interCloud(interRoot):
         return []
 
     def locateAll(self, user, password=()):
-        return self.STATIC.util.filterVerifyPassword(self.list[user], self.dirPassword[user], password,
-                                                     isInCheck=self.inCheck)
+        return self.STATIC.util.filterVerifyPassword(self.list[user], self.dirPassword[user], password)
 
     def locate(self, user, path, password=()):
         return self.STATIC.util.locateByPath(self.locateAll(user, password), path)

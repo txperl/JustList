@@ -1,8 +1,8 @@
 # coding=utf-8
-import re
 import threading
 import time
 import traceback
+from concurrent.futures import as_completed
 
 from altfe.interface.cloud import interCloud
 from app.lib.core.cloud189 import cloud189
@@ -71,16 +71,15 @@ class core_cloud189(interCloud):
     def load_list(self):
         for user in self.conf["accounts"].copy():
             self.inCheck = True
-            self.lock.acquire()
-            self.dirPassword[user] = {}
-            self.lock.release()
             tmp = []
             try:
                 self.__proLoad_list(user, tmp, -11, str(user) + "/", 0)
+                psws = self.STATIC.util.process_addPassword(tmp)
             except Exception as e:
                 self.STATIC.localMsger.error(e)
             else:
                 self.lock.acquire()
+                self.dirPassword[user] = psws
                 self.list[user] = tuple(tmp)
                 self.lock.release()
                 print(f"[Cloud189] {user} list updated at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
@@ -89,33 +88,25 @@ class core_cloud189(interCloud):
         return True
 
     def __proLoad_list(self, user=None, arr=[], fileId=-11, struri="", rootIndex=0):
+        isStart = True
         data = self.api[user].get_files(fileId)
-        password = None
+        # 进入根目录
         for file in data:
-            if "._.jl" in file["fileName"]:
-                password = file["fileName"][:-5]
-                break
-        for file in data:
-            # 进入根目录
             if len(self.rootPath) != 0 and rootIndex <= len(self.rootPath) - 1:
+                isStart = False
                 if file["isFolder"] and file["fileName"] == self.rootPath[rootIndex]:
                     self.__proLoad_list(
                         user, arr, file["fileId"], struri + file["fileName"] + "/", rootIndex + 1
                     )
                 continue
-            isPass = True
-            if not file["isFolder"]:
-                for x in self.conf["cant_visFile"]:
-                    if re.match(x, file["fileName"]) != None:
-                        isPass = False
-                        break
-            else:
-                for x in self.conf["cant_enterFolder"]:
-                    if re.match(x, file["fileName"]) != None:
-                        isPass = False
-                        break
-            if isPass is False:
+        if not isStart:
+            return
+        status = []
+        for file in data:
+            # 过滤排除的文件夹/文件
+            if self.STATIC.util.isNeedLoad(file["isFolder"], str(file["fileName"]), self.conf):
                 continue
+            # 项
             item = {
                 "isFolder": file["isFolder"],
                 "createTime": file["createTime"],
@@ -133,19 +124,13 @@ class core_cloud189(interCloud):
             if not file["isFolder"]:
                 item["fileSize"] = self.api[user].get_file_size_str(file["fileSize"])
                 item["fileType"] = file["fileType"]
-            if file["isFolder"]:
-                tmp = []
-                item["child"] = tmp
-                rep = self.__proLoad_list(
-                    user, tmp, file["fileId"], struri + file["fileName"] + "/", rootIndex + 1
-                )
-                if type(rep) == str:
-                    self.lock.acquire()
-                    self.dirPassword[user][item["fileId"]] = rep
-                    item["isSecret"] = True
-                    self.lock.release()
+            else:
+                status.append(self.COMMON.thread.plz().submit(self.__proLoad_list, *(
+                    user, item["child"], file["fileId"], struri + file["fileName"] + "/", rootIndex + 1)))
             arr.append(item)
-        return password
+        # 阻塞多线程获取文件夹内容
+        for x in as_completed(status):
+            pass
 
     def info(self, user, fId, dl=False):
         if not user in self.conf["accounts"]:

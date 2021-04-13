@@ -25,13 +25,11 @@ accounts:
 
 cant_enterFolder:
   # 加载目录时排除的文件夹名，正则 match
-  - ".*?\\._\\.jl"
   - "同步盘"
   - "我的.."
 
 cant_visFile:
   # 加载目录时排除的文件名，正则 match
-  - ".*?\\._\\.jl"
   - "\\..*?"
 
 rootPath: "/"

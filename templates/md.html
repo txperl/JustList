@@ -726,7 +726,7 @@
 
                     if (key === '')
                         return { process: [{ id: -11, name: key }], end: [] };
-                    key = new RegExp(key);
+                    key = new RegExp(key.toLowerCase());
 
                     this.$data.more._t = 'search';
                     var r = []

@@ -1,4 +1,5 @@
 import hashlib
+import re
 
 import bcrypt
 
@@ -8,12 +9,12 @@ from altfe.interface.root import interRoot
 @interRoot.bind("util", "LIB_STATIC")
 class static_util(object):
     @classmethod
-    def filterVerifyPassword(cls, li, allPassword={}, password=(), index=0, isInCheck=False):
+    def filterVerifyPassword(cls, li, allPassword={}, password=(), index=0):
         r = []
         for i in range(len(li)):
             file = li[i].copy()
             if file["isSecret"]:
-                if isInCheck is False and len(password) > index and cls.verifyBcryptPassword(password[index], allPassword[file["fileId"]]):
+                if len(password) > index and cls.verifyBcryptPassword(password[index], allPassword[file["fileId"]]):
                     index += 1
                 else:
                     if file["isFolder"]:
@@ -24,6 +25,26 @@ class static_util(object):
                 file["child"] = cls.filterVerifyPassword(file["child"], allPassword, password, index)
             r.append(file)
         return r
+
+    @classmethod
+    def process_addPassword(cls, arr, passwords={}):
+        """
+        查找用户列表文件中的加密文件夹。
+        :param arr: 用户网盘列表
+        :param passwords: 密码集
+        :return: dict@{fileId: password}
+        """
+        for file in arr:
+            if file["isFolder"]:
+                for i in range(len(file["child"])):
+                    child = file["child"][i]
+                    if "._.jl" in child["fileName"]:
+                        passwords[file["fileId"]] = child["fileName"][:-5]
+                        file["isSecret"] = True
+                        del file["child"][i]
+                        break
+                cls.process_addPassword(file["child"], passwords)
+        return passwords
 
     @classmethod
     def process_locateByID(cls, arr, fid, r):
@@ -60,6 +81,28 @@ class static_util(object):
             return bcrypt.checkpw(str(password).encode('utf8'), str(hashed).encode('utf8'))
         except:
             return False
+
+    @staticmethod
+    def isNeedLoad(isFolder, fileName, conf):
+        """
+        根据配置项判断是否需要跳过某一文件或文件夹。
+        :param isFolder: 是否是文件夹
+        :param fileName: 文件名
+        :param conf: 配置项
+        :return: bool
+        """
+        isPass = False
+        if not isFolder:
+            for x in conf["cant_visFile"]:
+                if re.match(x, fileName) is not None:
+                    isPass = True
+                    break
+        else:
+            for x in conf["cant_enterFolder"]:
+                if re.match(x, fileName) is not None:
+                    isPass = True
+                    break
+        return isPass
 
     @staticmethod
     def md5(c):

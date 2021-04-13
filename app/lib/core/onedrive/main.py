@@ -1,9 +1,9 @@
 # coding=utf-8
 import json
-import re
 import threading
 import time
 import traceback
+from concurrent.futures import as_completed
 from urllib import parse
 
 from altfe.interface.cloud import interCloud
@@ -26,6 +26,7 @@ class core_onedrive(interCloud):
 
     def auto(self):
         for u in self.conf["accounts"]:
+            self.realID[u] = {}
             is_cn = self.conf["accounts"][u][0]
             ms = onedrive.OneDrive("", IS_CN=is_cn)
             refreshToken = self.token[u] if u in self.token else None
@@ -86,17 +87,15 @@ class core_onedrive(interCloud):
     def load_list(self):
         for u in self.conf["accounts"].copy():
             self.inCheck = True
-            self.lock.acquire()
-            self.realID[u] = {}
-            self.dirPassword[u] = {}
-            self.lock.release()
             tmp = []
             try:
                 self.__proLoad_list(u, tmp)
+                psws = self.STATIC.util.process_addPassword(tmp)
             except Exception as e:
                 self.STATIC.localMsger.error(e)
             else:
                 self.lock.acquire()
+                self.dirPassword[u] = psws
                 self.list[u] = tuple(tmp)
                 self.lock.release()
                 print(f"[OneDrive] {u} list updated at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
@@ -116,68 +115,48 @@ class core_onedrive(interCloud):
         )
         data = json.loads(page.read().decode())
         if "error" in data:
-            print(data["error"]["message"])
-            return None
-        else:
-            password = None
-            for file in data["children"]:
-                if "._.jl" in file["name"]:
-                    password = file["name"][:-5]
-                    break
-            for file in data["children"]:
-                item = {
-                    "isFolder": "folder" in file,
-                    "createTime": 0,
-                    "lastOpTime": onedrive.Utils.formatTime(
-                        file["lastModifiedDateTime"]
-                    ),
-                    "parentId": self.STATIC.util.md5(file["parentReference"]["path"]),
-                    "fileId": self.STATIC.util.md5(
-                        file["parentReference"]["path"] + "/" + file["name"]
-                    ),
-                    "filePath": file["parentReference"]["path"].replace(
-                        "/drive/root:", user
-                    ),
-                    "fileName": str(file["name"]),
-                    "fileSize": onedrive.Utils.getSize(file["size"]),
-                    "fileType": None,
-                    "child": [],
-                    "user": user,
-                    "isSecret": False
-                }
-                isc = True
-                if not item["isFolder"]:
-                    for x in self.conf["cant_visFile"]:
-                        if re.match(x, item["fileName"]) != None:
-                            isc = False
-                            break
-                else:
-                    for x in self.conf["cant_enterFolder"]:
-                        if re.match(x, item["fileName"]) != None:
-                            isc = False
-                            break
-                if isc == False:
-                    continue
-                if not item["isFolder"]:
-                    item["fileType"] = str(file["name"]).split(".")[-1]
-                if item["isFolder"] and file["folder"]["childCount"] > 0:
-                    tmp = []
-                    item["child"] = tmp
-                    rep = self.__proLoad_list(
-                        user, tmp, file["parentReference"]["path"] + "/" + file["name"]
-                    )
-                    if type(rep) == str:
-                        self.lock.acquire()
-                        self.dirPassword[user][item["fileId"]] = rep
-                        item["isSecret"] = True
-                        self.lock.release()
-                self.lock.acquire()
-                self.realID[user][item["fileId"]] = (
-                        file["parentReference"]["path"] + "/" + file["name"]
-                )
-                self.lock.release()
-                arr.append(item)
-            return password
+            self.STATIC.localMsger.error(data["error"]["message"])
+            return
+        status = []
+        for file in data["children"]:
+            # 过滤排除的文件夹/文件
+            if self.STATIC.util.isNeedLoad("folder" in file, str(file["name"]), self.conf):
+                continue
+            # 项
+            item = {
+                "isFolder": "folder" in file,
+                "createTime": 0,
+                "lastOpTime": onedrive.Utils.formatTime(
+                    file["lastModifiedDateTime"]
+                ),
+                "parentId": self.STATIC.util.md5(file["parentReference"]["path"]),
+                "fileId": self.STATIC.util.md5(
+                    file["parentReference"]["path"] + "/" + file["name"]
+                ),
+                "filePath": file["parentReference"]["path"].replace(
+                    "/drive/root:", user
+                ),
+                "fileName": str(file["name"]),
+                "fileSize": onedrive.Utils.getSize(file["size"]),
+                "fileType": None,
+                "child": [],
+                "user": user,
+                "isSecret": False
+            }
+            if not item["isFolder"]:
+                item["fileType"] = str(file["name"]).split(".")[-1]
+            if item["isFolder"] and file["folder"]["childCount"] > 0:
+                status.append(self.COMMON.thread.plz().submit(self.__proLoad_list, *(
+                    user, item["child"], file["parentReference"]["path"] + "/" + file["name"])))
+            self.lock.acquire()
+            self.realID[user][item["fileId"]] = (
+                    file["parentReference"]["path"] + "/" + file["name"]
+            )
+            self.lock.release()
+            arr.append(item)
+        # 阻塞多线程获取文件夹内容
+        for x in as_completed(status):
+            pass
 
     def info(self, user, fid, dl=False):
         return self.api[user].get_file_info(self.realID[user][fid], dl)
