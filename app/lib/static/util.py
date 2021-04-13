@@ -8,12 +8,12 @@ from altfe.interface.root import interRoot
 @interRoot.bind("util", "LIB_STATIC")
 class static_util(object):
     @classmethod
-    def filterVerifyPassword(cls, li, allPassword={}, password=(), index=0):
+    def filterVerifyPassword(cls, li, allPassword={}, password=(), index=0, isInCheck=False):
         r = []
         for i in range(len(li)):
             file = li[i].copy()
             if file["isSecret"]:
-                if len(password) > index and cls.verifyBcryptPassword(password[index], allPassword[file["fileId"]]):
+                if isInCheck is False and len(password) > index and cls.verifyBcryptPassword(password[index], allPassword[file["fileId"]]):
                     index += 1
                 else:
                     if file["isFolder"]:
@@ -66,3 +66,21 @@ class static_util(object):
         md5 = hashlib.md5()
         md5.update((c).encode(encoding="utf-8"))
         return md5.hexdigest()
+
+    @staticmethod
+    def pureSize(size, dig=2, space=1):
+        """
+        格式化文件 size。
+        :param size: int: 文件大小
+        :param dig: int: 保留小数位数
+        :param space: int: 大小与单位之间的空格数量
+        :return:
+        str: 格式化的 size，如 "1.23 MB"
+        """
+        units = ["B", "KB", "MB", "GB", "TB", "PB"]
+        unit_index = 0
+        K = 1024.0
+        while size >= K:
+            size = size / K
+            unit_index += 1
+        return ("%." + str(dig) + "f" + " " * space + "%s") % (size, units[unit_index])

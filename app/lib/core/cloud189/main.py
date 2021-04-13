@@ -17,7 +17,6 @@ class core_cloud189(interCloud):
         self.token = _token if _token is not False else {}
         self.listOutdated = 0
         self.api = {}
-        self.inCheck = False
         self.lock = threading.Lock()
         self.rootPath = [x for x in self.conf["rootPath"].split("/") if x != ""]
         self.auto()
@@ -71,17 +70,21 @@ class core_cloud189(interCloud):
 
     def load_list(self):
         for user in self.conf["accounts"].copy():
+            self.inCheck = True
             self.lock.acquire()
             self.dirPassword[user] = {}
             self.lock.release()
             tmp = []
-            self.__proLoad_list(user, tmp, -11, str(user) + "/", 0)
-            self.lock.acquire()
-            self.inCheck = True
-            self.list[user] = tuple(tmp)
+            try:
+                self.__proLoad_list(user, tmp, -11, str(user) + "/", 0)
+            except Exception as e:
+                self.STATIC.localMsger.error(e)
+            else:
+                self.lock.acquire()
+                self.list[user] = tuple(tmp)
+                self.lock.release()
+                print(f"[Cloud189] {user} list updated at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             self.inCheck = False
-            self.lock.release()
-            print(f"[Cloud189] {user} list updated at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         self.listOutdated = time.time() + self.conf["sys_dataExpiredTime"]
         return True
 

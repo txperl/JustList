@@ -77,6 +77,7 @@ class static_local_msger(object):
 
     @classmethod
     def mformat(cls, text, front, back=None, method="default", header=None):
+        text = str(text)
         if header is None:
             finalText = text
         else:

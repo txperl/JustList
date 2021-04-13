@@ -5,15 +5,18 @@ class interCloud(interRoot):
     """
     网盘核心接口类。
     """
+
     def __init__(self):
         self.list = {}
         self.dirPassword = {}
+        self.inCheck = False
 
     def load_list(self):
         return []
 
     def locateAll(self, user, password=()):
-        return self.STATIC.util.filterVerifyPassword(self.list[user], self.dirPassword[user], password)
+        return self.STATIC.util.filterVerifyPassword(self.list[user], self.dirPassword[user], password,
+                                                     isInCheck=self.inCheck)
 
     def locate(self, user, path, password=()):
         return self.STATIC.util.locateByPath(self.locateAll(user, password), path)

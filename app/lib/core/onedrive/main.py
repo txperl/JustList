@@ -21,7 +21,6 @@ class core_onedrive(interCloud):
         self.api = {}
         self.listOutdated = 0
         self.realID = {}
-        self.inCheck = False
         self.lock = threading.Lock()
         self.auto()
 
@@ -86,18 +85,22 @@ class core_onedrive(interCloud):
 
     def load_list(self):
         for u in self.conf["accounts"].copy():
+            self.inCheck = True
             self.lock.acquire()
             self.realID[u] = {}
             self.dirPassword[u] = {}
             self.lock.release()
             tmp = []
-            self.__proLoad_list(u, tmp)
-            self.lock.acquire()
-            self.inCheck = True
-            self.list[u] = tuple(tmp)
+            try:
+                self.__proLoad_list(u, tmp)
+            except Exception as e:
+                self.STATIC.localMsger.error(e)
+            else:
+                self.lock.acquire()
+                self.list[u] = tuple(tmp)
+                self.lock.release()
+                print(f"[OneDrive] {u} list updated at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             self.inCheck = False
-            self.lock.release()
-            print(f"[OneDrive] {u} list updated at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         self.listOutdated = time.time() + self.conf["sys_dataExpiredTime"]
         return True
 
