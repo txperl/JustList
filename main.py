@@ -53,6 +53,6 @@ if __name__ == '__main__':
     logging.getLogger("werkzeug").setLevel(logging.ERROR)
 
     # 启动
-    app.run(host="127.0.0.1", port=5000, debug=True, threaded=True, use_reloader=False)
-    # http_server = WSGIServer(("127.0.0.1", 5000), app)
-    # http_server.serve_forever()
+    # app.run(host="127.0.0.1", port=5000, debug=True, threaded=True, use_reloader=False)
+    http_server = WSGIServer(("127.0.0.1", 5000), app)
+    http_server.serve_forever()
