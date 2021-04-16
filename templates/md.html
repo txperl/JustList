@@ -308,6 +308,7 @@
 <footer>
     <script src="//cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/localforage@1.9.0/dist/localforage.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/axios@0.19.2/dist/axios.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/vue-markdown@2.2.4/dist/vue-markdown.min.js"></script>
@@ -316,7 +317,7 @@
     <script src="//cdn.jsdelivr.net/npm/v-viewer@1.5.1/dist/v-viewer.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
     <script>
-        version = 2;
+        version = 3;
         tmp = {}; // 全局暂留
 
         Vue.use(VueLazyload, {
@@ -359,42 +360,43 @@
             },
             created: function () {
                 // 获取数据
-                let data = localStorage.getItem("cloud_list");
                 const salt = localStorage.getItem("cloud_salt");
                 const outdated = localStorage.getItem("cloud_outdated");
                 const tmpversion = localStorage.getItem("cloud_version");
-                if (data == null || salt == null || outdated == null || tmpversion == null || tmpversion < version || outdated <= Date.parse(new Date())) {
-                    localStorage.clear();
-                    const vm = this;
-                    axios.post(`${this.api_url}/api/get/list/`, {})
-                        .then(function (rep) {
-                            localStorage.setItem('cloud_list', JSON.stringify(rep["data"]["msg"]));
-                            localStorage.setItem('cloud_salt', dcodeIO.bcrypt.genSaltSync(10));
-                            localStorage.setItem('cloud_outdated', Date.parse(new Date()) + 600000);
-                            localStorage.setItem('cloud_version', version);
-                            data = localStorage.getItem("cloud_list");
-                            vm.load_data(vm, data);
-                            vm.toPath(window.location.hash);
-                            $("#loading").fadeOut();
-                            $("#main-part").fadeIn();
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                            mdui.snackbar({
-                                message: ': ( 数据获取失败...刷新页面或点击按钮以重试',
-                                buttonText: '重试',
-                                timeout: 0,
-                                onButtonClick: function () {
-                                    window.location.reload();
-                                }
+                const vm = this;
+                localforage.getItem("cloud_list").then((data) => {
+                    if (data == null || salt == null || outdated == null || tmpversion == null || tmpversion < version || outdated <= Date.parse(new Date())) {
+                        vm.refresh(false);
+                        axios.post(`${vm.api_url}/api/get/list/`, {})
+                            .then(function (rep) {
+                                localStorage.setItem('cloud_salt', dcodeIO.bcrypt.genSaltSync(10));
+                                localStorage.setItem('cloud_outdated', Date.parse(new Date()) + 600000);
+                                localStorage.setItem('cloud_version', version);
+                                localforage.setItem('cloud_list', JSON.stringify(rep["data"]["msg"])).then((val) => {
+                                    vm.load_data(vm, val);
+                                    vm.toPath(window.location.hash);
+                                    $("#loading").fadeOut();
+                                    $("#main-part").fadeIn();
+                                });
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                                mdui.snackbar({
+                                    message: ': ( 数据获取失败... 刷新页面或点击按钮以重试',
+                                    buttonText: '重试',
+                                    timeout: 0,
+                                    onButtonClick: function () {
+                                        vm.refresh();
+                                    }
+                                });
                             });
-                        });
-                } else {
-                    this.load_data(this, data);
-                    this.toPath(window.location.hash);
-                    $("#loading").fadeOut();
-                    $("#main-part").fadeIn();
-                }
+                    } else {
+                        vm.load_data(vm, data);
+                        vm.toPath(window.location.hash);
+                        $("#loading").fadeOut();
+                        $("#main-part").fadeIn();
+                    }
+                });
             },
             delimiters: ['[[', ']]'],
             methods: {
@@ -403,14 +405,14 @@
                     try {
                         data = JSON.parse(data);
                     } catch (e) {
+                        const vm = this;
                         console.log(e);
                         mdui.snackbar({
-                            message: ': (( 初始化失败...点击按钮以重试',
+                            message: ': (( 初始化失败... 点击按钮以重试',
                             buttonText: '重试',
                             timeout: 0,
                             onButtonClick: function () {
-                                localStorage.clear();
-                                window.location.reload();
+                                vm.refresh();
                             }
                         });
                     }
@@ -500,8 +502,9 @@
                                         break
                                     }
                                 }
-                                localStorage.setItem('cloud_list', JSON.stringify(vm.file_list_data));
-                                vm.toPath(window.location.hash);
+                                localforage.setItem('cloud_list', JSON.stringify(vm.file_list_data)).then(
+                                    () => vm.toPath(window.location.hash)
+                                );
                             } else {
                                 mdui.snackbar({ message: "密码错误，或此目录为空", timeout: 1500 });
                             }
@@ -545,9 +548,11 @@
                 viewer_onHidden: function () {
                     this.$set(this.more, '_viewer', []);
                 },
-                refresh: function () {
+                refresh: function (page = true) {
                     localStorage.clear();
-                    window.location.reload();
+                    localforage.clear();
+                    if (page)
+                        window.location.reload();
                 },
                 change_type: function (c) {
                     this.more._t = c;

@@ -8,15 +8,16 @@
 
 ## 功能
 
-* **多网盘支持**，包含天翼云盘、OneDrive、OneDrive 世纪互联
-* 可**同时启用多个网盘的多个用户**
-* 可**设置文件夹密码**，即私密目录
-* 有用的**请求预处理机制**，包含 Rate Limit、Referrer 验证等
+* 多网盘支持，包含天翼云盘、OneDrive、OneDrive 世纪互联
+* 本地文件目录索引支持
+* 可同时启用多个网盘的多个用户
+* 可设置文件夹密码，即私密目录
+* 有用的请求预处理机制，包含 Rate Limit、Referrer 验证等
 * 简洁的缓存与自动刷新机制
 
 ## 部署
 
-本程序支持前后端分离，以下主要为后端部署说明。 
+本程序支持前后端分离，以下主要为后端部署说明。
 
 总的来说，很简单的几步：
 
@@ -37,15 +38,23 @@ $ pip3 install -r requirements.txt
 
 所有配置文件都放于 `./app/config/` 文件夹中，如下：
 
-- **cloud189.yml**：天翼云盘配置（需禁止的文件、根目录、刷新时间等）
+- **local.yml**：本地目录配置项
+- **cloud189.yml**：天翼云盘配置（设置需禁止的文件、根目录、刷新时间等）
 - **onedrive.yml**：OneDrive 配置（同上）
-- **switch.yml**：插件开关与预处理相关配置（开关、rate limit、referrer 验证等）
+- **switch.yml**：插件开关与预处理相关配置（开启/关闭核心、rate limit、referrer 验证等）
 
 只需修改您想使用的网盘配置项即可，**各选项详细描述可见各配置文件中的注释**。
 
-若要使用，必须修改的是账号相关的配置，如下：
+若要使用相应功能，必须修改的是账号相关的配置，如下：
 
 ``` yaml
+# 本地目录配置项，下列字段位于 ./app/config/local.yml
+accounts:
+  Local_A:
+    - "<path_a>"
+  Local_B:
+    - "<path_b>"
+
 # 天翼云盘，下列字段位于 ./app/config/cloud189.yml
 accounts:
   Cloud189_User1:
@@ -75,10 +84,12 @@ accounts:
 # true 为开启，false 为停用
 OnOff:
   core:
-    cloud189: true
-    # 天翼云盘模块
-    onedrive: true
-    # onedrive 模块
+    local: false
+      # 本地目录模块
+    cloud189: false
+      # 天翼云盘模块
+    onedrive: false
+      # onedrive 模块
 ```
 
 将相应模块的 `false` 改为 `true` 即可。
@@ -164,17 +175,21 @@ clientId = [
 ├── altfe                             # Altfe 代码框架核心
 ├── app                               # JustList 主程序代码
 ├── ├── config                        # 配置项
+├── ├── ├── local.yml
 ├── ├── ├── cloud189.yml
 ├── ├── ├── onedrive.yml
 ├── ├── ├── switch.yml
 ├── ├── lib                           # 全局模块，启动时加载并实例化相应模块，供其他模块调用
-├── ├── ├── common
+├── ├── ├── common                    # 通用类
+├── ├── ├── ├── thread.py
 ├── ├── ├── static                    # 静态类
 ├── ├── ├── ├── arg.py
 ├── ├── ├── ├── file.py
 ├── ├── ├── ├── msg.py
 ├── ├── ├── ├── util.py
 ├── ├── ├── core                      # 核心类
+├── ├── ├── ├── local                 # 本地目录模块
+├── ├── ├── ├── ├── main.py
 ├── ├── ├── ├── cloud189              # 天翼云盘模块
 ├── ├── ├── ├── ├── cloud189.py
 ├── ├── ├── ├── ├── main.py
@@ -200,37 +215,43 @@ clientId = [
 此部分可自行修改插件以更改。
 
 1. `[POST] api/get/list/`
+
 * **目录获取**
 * 示例
-  + `api/get/list/` : 返回全部目录
-  + `api/get/list/user1/` : 返回 user 1 的全部目录
-  + `api/get/list/user2/a/b/` : 返回 user2 的 a 目录下的 b 目录/文件（如果存在）
-    + `application/json; charset=utf-8`
-    + `password` : 目录密码（可选）
-  + `api/get/list/user3/` : 返回 user3 的 id 为 xxx 的目录/文件
-    + `application/json; charset=utf-8`
-    + `id` : 文件 ID
-    + `password` : 目录密码（可选）
+    + `api/get/list/` : 返回全部目录
+    + `api/get/list/user1/` : 返回 user 1 的全部目录
+    + `api/get/list/user2/a/b/` : 返回 user2 的 a 目录下的 b 目录/文件（如果存在）
+        + `application/json; charset=utf-8`
+        + `password` : 目录密码（可选）
+    + `api/get/list/user3/` : 返回 user3 的 id 为 xxx 的目录/文件
+        + `application/json; charset=utf-8`
+        + `id` : 文件 ID
+        + `password` : 目录密码（可选）
 
 2. `[POST] api/get/text`
+
 * **文本文件内容获取**
 * 示例
-  + 如上，仅需将 `api/get/list/` 替换为 `api/get/text/` 即可
-  + 仅支持 `.txt` 与 `.md` 格式文件
+    + 如上，仅需将 `api/get/list/` 替换为 `api/get/text/` 即可
+    + 仅支持 `.txt` 与 `.md` 格式文件
 
 3. `[GET] file`
+
 * **直链跳转（下载文件）**
 * 示例
-  + 如上，仅需将 `api/get/list/` 替换为 `file/` 即可
+    + 如上，仅需将 `api/get/list/` 替换为 `file/` 即可
 
 4. `[GET] sys/update/xxxiiixxx/`
+
 * **强制刷新网盘目录缓存**
 
 ## 说明
 
 * 本程序会一次性加载全部允许的文件并缓存，所以若文件较多此过程可能会较慢（取决于你文件的数量与网络状况），但不影响正常运行
 * 仅在小规模（天翼云盘x2、OneDrive 国际版x1、世纪互联版x1）且请求、文件数量中等的情况下测试，服务可用率约为 99%
-* 网盘操作代码修改自 [Aruelius/cloud189](https://github.com/Aruelius/cloud189)、[MoeClub/OneList](https://github.com/MoeClub/OneList)，感谢
+*
+
+网盘操作代码修改自 [Aruelius/cloud189](https://github.com/Aruelius/cloud189)、[MoeClub/OneList](https://github.com/MoeClub/OneList)，感谢
 
 ## 声明
 

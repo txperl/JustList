@@ -183,12 +183,9 @@ class cloud189(object):
         return r["data"]
 
     def get_file_info(self, fileid, dl=False):
-        try:
-            r = self.session.get(
-                f"https://cloud.189.cn/v2/getFileInfo.action?fileId={fileid}", timeout=6
-            ).json()
-        except:
-            return False
+        r = self.session.get(
+            f"https://cloud.189.cn/v2/getFileInfo.action?fileId={fileid}", timeout=6
+        ).json()
         if not dl:
             return r
         if "downloadUrl" in r:

@@ -133,12 +133,13 @@ class core_cloud189(interCloud):
             pass
 
     def info(self, user, fId, dl=False):
-        if not user in self.conf["accounts"]:
-            return False
-
         try:
             return self.api[user].get_file_info(fId, dl)
-        except:
+        except Exception as e:
+            self.STATIC.localMsger.error(e)
             self.api[user].login()
-
-        return self.api[user].get_file_info(fId, dl)
+            try:
+                return self.api[user].get_file_info(fId, dl)
+            except Exception as ee:
+                self.STATIC.localMsger.error(ee)
+                return False

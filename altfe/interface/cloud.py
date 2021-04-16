@@ -22,10 +22,8 @@ class interCloud(interRoot):
 
     def locate_id(self, user, fid, password=()):
         li = self.locateAll(user, password)
-
         if fid == -11:
             return li
-
         tmp = {0: []}
         self.STATIC.util.process_locateByID(li, fid, tmp)
         return tmp[0]

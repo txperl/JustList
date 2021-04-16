@@ -33,19 +33,19 @@ cant_visFile:
   - "\\..*?"
 
 rootPath: "/"
-# 根目录
+  # 根目录
 
 sys_checkTime: 60
-# 程序自检任务时间间隔（秒，下同）
+  # 程序自检任务时间间隔（秒，下同）
 
 sys_tokenExpiredTime: 3600
-# token 缓存有效时间
+  # token 缓存有效时间
 
 sys_dataExpiredTime: 900
-# 文件目录缓存有效时间
+  # 文件目录缓存有效时间
 
 sys_dl_urlExpiredNum: 35
-# 下载链接缓存的有效次数
+  # 下载链接缓存的有效次数
 
 sys_dl_urlExpiredTime: 300
-# 下载链接缓存的有效时间
+  # 下载链接缓存的有效时间

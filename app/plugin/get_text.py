@@ -57,8 +57,12 @@ class do_get_text(interRoot):
                 if not file or (file[0]["fileType"] != "txt" and file[0]["fileType"] != "md"):
                     return "404 Not Found.", 404
                 fId = file[0]["fileId"]
+
             # 获取下载链接
-            url = api.info(user, fId, True)
+            if type(api).__name__ == "core_local":
+                return api.info(user, fId, False)
+            else:
+                url = api.info(user, fId, True)
 
         if url:
             try:

@@ -61,6 +61,9 @@ class do_file(interRoot):
         if url:
             self.CORE.cache.set(key, url, api.conf["sys_dl_urlExpiredTime"])
             self.CORE.cache.set(key + "_psw", argv["password"], api.conf["sys_dl_urlExpiredTime"] + 2)
-            return redirect(url)
+            if type(url) == str:
+                return redirect(url)
+            else:
+                return url
         else:
             return "Have no File.", 400

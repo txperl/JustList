@@ -1,0 +1,28 @@
+# 本地目录配置项
+
+accounts:
+  # 本地目录账号
+  # 可输入多组账号，但自定义名称不可相同
+  #
+  # 请参考如下格式填写：
+  # <自定义名称>:
+  #   - <本地路径>
+  #
+  # 例子（注意缩进）：
+  # Local_A:
+  #   - "/Users/txperl/"
+  # Local_B:
+  #   - "C:/Users/txperl/"
+  LocalFile:
+    - "<your_path>"
+
+cant_enterFolder:
+  # 加载目录时排除的文件夹名，正则 match
+  - "我的小秘密"
+
+cant_visFile:
+  # 加载目录时排除的文件名，正则 match
+  - "\\..*?"
+
+sys_dataExpiredTime: 1200
+  # 文件目录缓存有效时间（秒）

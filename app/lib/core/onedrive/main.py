@@ -145,7 +145,7 @@ class core_onedrive(interCloud):
             }
             if not item["isFolder"]:
                 item["fileType"] = str(file["name"]).split(".")[-1]
-            if item["isFolder"] and file["folder"]["childCount"] > 0:
+            elif file["folder"]["childCount"] > 0:
                 status.append(self.COMMON.thread.plz().submit(self.__proLoad_list, *(
                     user, item["child"], file["parentReference"]["path"] + "/" + file["name"])))
             self.lock.acquire()
@@ -159,4 +159,8 @@ class core_onedrive(interCloud):
             pass
 
     def info(self, user, fid, dl=False):
-        return self.api[user].get_file_info(self.realID[user][fid], dl)
+        try:
+            return self.api[user].get_file_info(self.realID[user][fid], dl)
+        except Exception as e:
+            self.STATIC.localMsger.error(e)
+            return False
