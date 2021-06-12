@@ -2,6 +2,7 @@ import base64
 import hashlib
 import os
 import re
+import math
 
 import requests
 import rsa
@@ -165,6 +166,8 @@ class cloud189(object):
             return f"{filesize}Bytes"
 
     def get_files(self, fileId=-11):
+        fileList=[]
+        pageNum=1
         try:
             r = self.session.get(
                 url="https://cloud.189.cn/v2/listFiles.action",
@@ -180,7 +183,31 @@ class cloud189(object):
             ).json()
         except:
             return []
-        return r["data"]
+        
+        fileList.extend(r["data"])
+        filesCount=r["recordCount"]
+        pageCount=math.ceil(filesCount/60)
+
+        #more page
+        while pageNum<pageCount:
+            pageNum+=1
+            try:
+                r = self.session.get(
+                        url="https://cloud.189.cn/v2/listFiles.action",
+                        params={
+                            "fileId": fileId,
+                            "inGroupSpace": "false",
+                            "orderBy": "1",
+                            "order": "ASC",
+                            "pageNum": pageNum,
+                            "pageSize": "60",
+                            },
+                        timeout=6,
+                        ).json()
+                fileList.extend(r["data"])
+            except:
+                return []
+        return fileList
 
     def get_file_info(self, fileid, dl=False):
         r = self.session.get(
