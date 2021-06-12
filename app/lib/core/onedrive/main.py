@@ -2,7 +2,6 @@
 import json
 import threading
 import time
-import traceback
 from concurrent.futures import as_completed
 from urllib import parse
 
@@ -61,9 +60,8 @@ class core_onedrive(interCloud):
             self.__update_token(tim)
             if tim > self.listOutdated:
                 self.load_list()
-        except:
-            print("[OneDrive Error] " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(tim)))
-            print(traceback.format_exc())
+        except Exception as e:
+            self.STATIC.localMsger.error(e)
         t = threading.Timer(self.conf["sys_checkTime"], self.__childth_check)
         t.setDaemon(True)
         t.start()

@@ -93,13 +93,17 @@ class static_util(object):
         """
         isPass = False
         if not isFolder:
+            if conf["cant_visFile"] is None:
+                return False
             for x in conf["cant_visFile"]:
-                if re.match(x, fileName) is not None:
+                if re.match(str(x), fileName) is not None:
                     isPass = True
                     break
         else:
+            if conf["cant_enterFolder"] is None:
+                return False
             for x in conf["cant_enterFolder"]:
-                if re.match(x, fileName) is not None:
+                if re.match(str(x), fileName) is not None:
                     isPass = True
                     break
         return isPass

@@ -1,7 +1,6 @@
 import os
 import threading
 import time
-import traceback
 from concurrent.futures import as_completed
 
 from flask import send_file
@@ -34,9 +33,8 @@ class core_local(interCloud):
     def __childth_check(self):
         try:
             self.load_list()
-        except:
-            print("[Local Error] " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())))
-            print(traceback.format_exc())
+        except Exception as e:
+            self.STATIC.localMsger.error(e)
         t = threading.Timer(self.conf["sys_dataExpiredTime"], self.__childth_check)
         t.setDaemon(True)
         t.start()
