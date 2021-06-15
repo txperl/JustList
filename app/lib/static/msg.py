@@ -2,6 +2,7 @@
 import os
 import platform
 import time
+import traceback
 
 BIUMSG_METHODS = {
     "default": 0, "highlight": 1, "underline": 4, "flash": 5, "anti": 7, "disable": 8
@@ -49,9 +50,8 @@ class static_local_msger(object):
         r = cls.mformat(text, "red", header=header)
         if not out:
             return r
-        print("Error at %s:" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        print("!Error at %s:" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         print(r)
-        print("End;")
 
     @classmethod
     def green(cls, text, header=None, out=True):
@@ -77,7 +77,10 @@ class static_local_msger(object):
 
     @classmethod
     def mformat(cls, text, front, back=None, method="default", header=None):
-        text = str(text)
+        if isinstance(text, Exception):
+            text = traceback.format_exc()
+        else:
+            text = str(text)
         if header is None:
             finalText = text
         else:

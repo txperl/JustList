@@ -1,7 +1,6 @@
 # coding=utf-8
 import threading
 import time
-import traceback
 from concurrent.futures import as_completed
 
 from altfe.interface.cloud import interCloud
@@ -46,9 +45,8 @@ class core_cloud189(interCloud):
             self.__update_token(tim)
             if tim > self.listOutdated:
                 self.load_list()
-        except:
-            print("[Cloud189 Error] " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(tim)))
-            print(traceback.format_exc())
+        except Exception as e:
+            self.STATIC.localMsger.error(e)
         t = threading.Timer(self.conf["sys_checkTime"], self.__childth_check)
         t.setDaemon(True)
         t.start()
