@@ -216,6 +216,14 @@ class cloud189(object):
         if not dl:
             return r
         if "downloadUrl" in r:
+            if r["mediaType"]==3: # video type
+                downloadUrl=r["downloadUrl"]
+                # ?fileStr=[0-9A-Z]{120} if not & index,will Error
+                fileStr=downloadUrl[downloadUrl.find('?'):downloadUrl.rindex('&')]
+                getVideoUrl = self.session.get("https://cloud.189.cn/v2/getVideoUrl.action"+fileStr, timeout=6).json()
+                rr=self.session.get("https:"+getVideoUrl["url"], allow_redirects=False)
+                return rr.headers["Location"]
+
             rr = self.session.get("https:" + r["downloadUrl"], allow_redirects=False)
             return rr.headers["Location"]
         return False
