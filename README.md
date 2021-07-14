@@ -45,7 +45,7 @@ $ pip3 install -r requirements.txt
 
 只需修改您想使用的网盘配置项即可，**各选项详细描述可见各配置文件中的注释**。
 
-若要使用相应功能，必须修改的是账号相关的配置，如下：
+**若要使用相应功能，必须修改的是账号相关的配置**，如下：
 
 ``` yaml
 # 本地目录配置项，下列字段位于 ./app/config/local.yml
@@ -197,10 +197,10 @@ clientId = [
 ├── ├── ├── ├── ├── onedrive.py
 ├── ├── ├── ├── ├── main.py
 ├── ├── ├── ├── cache.py
-├── ├── pre                           # 预处理模块，当插件被实例化前执行
+├── ├── pre                           # 预处理模块，当收到请求后但在插件实例化前执行
 ├── ├── ├── rate_limit.py             # rate limit 代码
 ├── ├── ├── verify_referrer.py        # referrer 验证代码
-├── ├── plugin                        # 插件模块，当收到请求后会被实例化
+├── ├── plugin                        # 插件模块，当收到请求后会被实例化并执行
 ├── ├── ├── do_file.py                # 直链跳转
 ├── ├── ├── get_list.py               # 目录获取
 ├── ├── ├── get_text.py               # 文本文件内容获取
@@ -221,10 +221,10 @@ clientId = [
     + `api/get/list/` : 返回全部目录
     + `api/get/list/user1/` : 返回 user 1 的全部目录
     + `api/get/list/user2/a/b/` : 返回 user2 的 a 目录下的 b 目录/文件（如果存在）
-        + `application/json; charset=utf-8`
+        + `# application/json; charset=utf-8`
         + `password` : 目录密码（可选）
     + `api/get/list/user3/` : 返回 user3 的 id 为 xxx 的目录/文件
-        + `application/json; charset=utf-8`
+        + `# application/json; charset=utf-8`
         + `id` : 文件 ID
         + `password` : 目录密码（可选）
 
@@ -249,9 +249,7 @@ clientId = [
 
 * 本程序会一次性加载全部允许的文件并缓存，所以若文件较多此过程可能会较慢（取决于你文件的数量与网络状况），但不影响正常运行
 * 仅在小规模（天翼云盘x2、OneDrive 国际版x1、世纪互联版x1）且请求、文件数量中等的情况下测试，服务可用率约为 99%
-*
-
-网盘操作代码修改自 [Aruelius/cloud189](https://github.com/Aruelius/cloud189)、[MoeClub/OneList](https://github.com/MoeClub/OneList)，感谢
+* 网盘操作代码修改自 [Aruelius/cloud189](https://github.com/Aruelius/cloud189)、[MoeClub/OneList](https://github.com/MoeClub/OneList)，感谢
 
 ## 声明
 
