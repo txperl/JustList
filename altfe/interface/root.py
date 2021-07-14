@@ -81,9 +81,9 @@ class classRoot(object):
         return wrapper
 
     @staticmethod
-    def loadConfig(uri):
+    def loadConfig(uri, default=False):
         if not os.path.exists(uri) or (".token.json" in uri and (time.time() - os.path.getmtime(uri) > 3600 * 24)):
-            return False
+            return default
         with open(uri, "r", encoding="UTF-8") as f:
             sfx = uri.split(".")[-1]
             if sfx == "json":

@@ -109,6 +109,7 @@ class OneDrive:
         self.redirect_uri = redirectUri
         self.refresh_token = refreshToken
         self.access_token = ""
+        self.outdated = 0
 
     @staticmethod
     def accessData(grantType, redirectUri=redirectHost[0], IS_CN=0):
@@ -156,6 +157,7 @@ class OneDrive:
         if "refresh_token" in resp and "access_token" in resp:
             self.access_token = resp["access_token"]
             self.refresh_token = resp["refresh_token"]
+            self.outdated = time.time() + resp["expires_in"]
         else:
             raise Exception("Error, Get Refresh Token.")
 
@@ -178,6 +180,7 @@ class OneDrive:
         if "refresh_token" in resp and "access_token" in resp:
             self.access_token = resp["access_token"]
             self.refresh_token = resp["refresh_token"]
+            self.outdated = time.time() + resp["expires_in"]
             return resp
         else:
             raise Exception("Error, Get Access Token.")

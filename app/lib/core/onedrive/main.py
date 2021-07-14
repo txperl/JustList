@@ -14,9 +14,6 @@ class core_onedrive(interCloud):
     def __init__(self):
         super().__init__()
         self.conf = self.loadConfig(self.getENV("rootPath") + "app/config/onedrive.yml")
-        _token = self.loadConfig(self.getENV("rootPath") + "app/lib/core/onedrive/.token.json")
-        self.token = _token if _token is not False else {}
-        self.accessToken = {}
         self.api = {}
         self.listOutdated = 0
         self.realID = {}
@@ -24,32 +21,27 @@ class core_onedrive(interCloud):
         self.auto()
 
     def auto(self):
+        _token = self.loadConfig(self.getENV("rootPath") + "app/lib/core/onedrive/.token.json", default={})
         for u in self.conf["accounts"]:
+            if u not in _token:
+                _token[u] = None
             self.realID[u] = {}
             is_cn = self.conf["accounts"][u][0]
-            ms = onedrive.OneDrive("", IS_CN=is_cn)
-            refreshToken = self.token[u] if u in self.token else None
-            if refreshToken is None:
+            self.api[u] = onedrive.OneDrive(_token[u],
+                                            self.conf["rootPath"],
+                                            onedrive.redirectHost[is_cn],
+                                            is_cn)
+            if _token[u] is None:
                 print(f"[{u}] 进入以下网址以获取 Code 字段")
                 print(
                     f"{onedrive.oauthHost[is_cn]}/common/oauth2/v2.0/authorize?client_id={onedrive.clientId[is_cn]}&response_type=code&redirect_uri={onedrive.redirectHost[is_cn]}&response_mode=query&scope=offline_access%20User.Read%20Files.ReadWrite.All"
                 )
                 print("Code 为跳转后 URL 的 ?code= 到 &session_state 的中间部分")
                 code = str(input("Code: ").strip())
-                ms.getToken(code)
-                refreshToken = ms.refresh_token
-                self.token[u] = refreshToken
-            self.api[u] = onedrive.OneDrive(
-                refreshToken,
-                self.conf["rootPath"],
-                onedrive.redirectHost[is_cn],
-                is_cn,
-            )
-            self.accessToken[u] = self.api[u].getAccessToken()
-            self.accessToken[u]["outdated"] = time.time() + self.accessToken[u]["expires_in"] - 60
-        self.STATIC.file.aout(
-            self.getENV("rootPath") + "app/lib/core/onedrive/.token.json", self.token
-        )
+                self.api[u].getToken(code)
+            else:
+                self.api[u].getAccessToken()
+        self.__save_refreshToken()
         t = threading.Timer(0, self.__childth_check)
         t.setDaemon(True)
         t.start()
@@ -68,19 +60,20 @@ class core_onedrive(interCloud):
 
     def __update_token(self, tim):
         isUp = False
-        for u in self.conf["accounts"]:
-            if tim > self.accessToken[u]["outdated"]:
-                tmp = self.api[u].getAccessToken(self.token[u])
-                tmp["outdated"] = time.time() + tmp["expires_in"] - 60
-                self.lock.acquire()
-                self.accessToken[u] = tmp
-                self.token[u] = self.accessToken[u]["refresh_token"]
-                self.lock.release()
+        for u in self.api:
+            if tim > self.api[u].outdated - 600:
+                self.api[u].getAccessToken()
                 isUp = True
         if isUp:
-            self.STATIC.file.aout(
-                self.getENV("rootPath") + "app/lib/core/onedrive/.token.json", self.token
-            )
+            self.__save_refreshToken()
+
+    def __save_refreshToken(self):
+        r = {}
+        for u in self.api:
+            r[u] = self.api[u].refresh_token
+        self.STATIC.file.aout(
+            self.getENV("rootPath") + "app/lib/core/onedrive/.token.json", r
+        )
 
     def load_list(self):
         for u in self.conf["accounts"].copy():
