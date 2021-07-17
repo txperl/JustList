@@ -85,16 +85,15 @@ class core_module_cache(object):
         self.lock.release()
 
     def __check(self):
-        try:
-            tim = int(time.time())
-            for key in self._cache:
-                try:
-                    if tim > int(self._cache[key]["ttl"]):
-                        self.delete(key)
-                except:
-                    continue
-        except:
-            pass
-        t = threading.Timer(self._check_time, self.__check)
-        t.setDaemon(True)
-        t.start()
+        while True:
+            try:
+                tim = int(time.time())
+                for key in self._cache:
+                    try:
+                        if tim > int(self._cache[key]["ttl"]):
+                            self.delete(key)
+                    except:
+                        continue
+            except:
+                pass
+            time.sleep(self._check_time)

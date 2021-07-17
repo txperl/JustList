@@ -47,16 +47,15 @@ class core_onedrive(interCloud):
         t.start()
 
     def __childth_check(self):
-        tim = time.time()
-        try:
-            self.__update_token(tim)
-            if tim > self.listOutdated:
-                self.load_list()
-        except Exception as e:
-            self.STATIC.localMsger.error(e)
-        t = threading.Timer(self.conf["sys_checkTime"], self.__childth_check)
-        t.setDaemon(True)
-        t.start()
+        while True:
+            tim = time.time()
+            try:
+                self.__update_token(tim)
+                if tim > self.listOutdated:
+                    self.load_list()
+            except Exception as e:
+                self.STATIC.localMsger.error(e)
+            time.sleep(self.conf["sys_checkTime"])
 
     def __update_token(self, tim):
         isUp = False

@@ -31,13 +31,12 @@ class core_local(interCloud):
         t.start()
 
     def __childth_check(self):
-        try:
-            self.load_list()
-        except Exception as e:
-            self.STATIC.localMsger.error(e)
-        t = threading.Timer(self.conf["sys_dataExpiredTime"], self.__childth_check)
-        t.setDaemon(True)
-        t.start()
+        while True:
+            try:
+                self.load_list()
+            except Exception as e:
+                self.STATIC.localMsger.error(e)
+            time.sleep(self.conf["sys_dataExpiredTime"])
 
     def load_list(self):
         for u in self.accounts:
