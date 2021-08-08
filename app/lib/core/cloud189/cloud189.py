@@ -62,7 +62,7 @@ class cloud189(object):
 
     def redirect(self):
         r = self.session.get(
-            "https://cloud.189.cn/udb/udb_login.jsp?pageId=1&redirectURL=/main.action"
+            "https://cloud.189.cn/api/portal/loginUrl.action?pageId=1&redirectURL=https://cloud.189.cn/main.action"
         )
         captchaToken = re.findall(r"captchaToken' value='(.+?)'", r.text)[0]
         lt = re.findall(r'lt = "(.+?)"', r.text)[0]
