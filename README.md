@@ -17,8 +17,7 @@
 
 ## 部署
 
-### Docker
-您可以使用 Docker 进行部署，具体可以参考 [docker-hub@txperl/justlist](https://hub.docker.com/r/txperl/justlist)。
+您可以使用 **Docker** 进行部署，具体可以参考 [docker-hub@txperl/justlist](https://hub.docker.com/r/txperl/justlist)。
 
 本程序支持前后端分离，以下主要为后端部署说明。
 
@@ -31,10 +30,9 @@
 
 ### 1. 安装依赖
 
-* Python 3.7(+)
-
 ``` bash
-$ pip3 install -r requirements.txt
+# Python 3.7(+)
+$ pip install -r requirements.txt
 ```
 
 ### 2. 修改配置
@@ -82,7 +80,7 @@ accounts:
 
 编辑 `./app/config/switch.yml`，修改 `OnOff-core` 选项，如下。
 
-``` yml
+``` yaml
 # 开启或停用模块
 # true 为开启，false 为停用
 OnOff:
@@ -100,7 +98,7 @@ OnOff:
 ### 4. 启动程序
 
 ``` bash
-$ python3 main.py
+$ python main.py
 ```
 
 若要更改程序的运行地址，请修改 `./main.py`。默认为 `http://127.0.0.1:5000/`。
