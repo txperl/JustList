@@ -17,6 +17,9 @@
 
 ## 部署
 
+### Docker
+您可以使用 Docker 进行部署，具体可以参考 [docker-hub@txperl/justlist](https://hub.docker.com/r/txperl/justlist)。
+
 本程序支持前后端分离，以下主要为后端部署说明。
 
 总的来说，很简单的几步：
