@@ -365,7 +365,8 @@
                 const tmpversion = localStorage.getItem("cloud_version");
                 const vm = this;
                 window.addEventListener("hashchange", (event) => {
-                    vm.toPath(event.newURL.split(vm.root_url + "/#")[1]);
+                    const to_ = event.newURL.split(vm.root_url + "/#")[1];
+                    vm.toPath(to_ ? to_ : "");
                 });
                 localforage.getItem("cloud_list").then((data) => {
                     if (data == null || salt == null || outdated == null || tmpversion == null || tmpversion < version || outdated <= Date.parse(new Date())) {
