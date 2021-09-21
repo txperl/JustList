@@ -364,6 +364,9 @@
                 const outdated = localStorage.getItem("cloud_outdated");
                 const tmpversion = localStorage.getItem("cloud_version");
                 const vm = this;
+                window.addEventListener("hashchange", (event) => {
+                    vm.toPath(event.newURL.split(vm.root_url + "/#")[1]);
+                });
                 localforage.getItem("cloud_list").then((data) => {
                     if (data == null || salt == null || outdated == null || tmpversion == null || tmpversion < version || outdated <= Date.parse(new Date())) {
                         vm.refresh(false);
@@ -428,7 +431,7 @@
                 },
                 go_hash: function (url) {
                     window.location.hash = url;
-                    this.toPath(url);
+                    // this.toPath(url);
                 },
                 go_back: function (step) {
                     if (this.paths.length <= 1) {
