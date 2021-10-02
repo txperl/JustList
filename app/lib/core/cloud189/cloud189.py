@@ -166,29 +166,55 @@ class cloud189(object):
 
     def get_files(self, fileId=-11):
         try:
-            r = self.session.get(
-                url="https://cloud.189.cn/v2/listFiles.action",
+            rep = self.session.get(
+                url="https://cloud.189.cn/api/open/file/listFiles.action",
                 params={
-                    "fileId": fileId,  # 目录
-                    "inGroupSpace": "false",
-                    "orderBy": "1",
-                    "order": "ASC",
-                    "pageNum": "1",
-                    "pageSize": "999999",
+                    "folderId": fileId,
+                    "orderBy": "lastOpTime",
+                    "pageNum": 1,
+                    "pageSize": 60,
+                    "descending": True,
+                    "mediaType": 0,
+                    "noCache": 0
                 },
+                headers={"Accept": "application/json;charset=UTF-8"},
                 timeout=6,
             ).json()
         except:
             return []
-        return r["data"]
+        if "fileListAO" not in rep:
+            return []
+        rep = rep["fileListAO"]
+        r = []
+        for type_ in ("folderList", "fileList"):
+            for x in rep[type_]:
+                r.append({
+                    "isFolder": type_ == "folderList",
+                    "createTime": x["createDate"],
+                    "lastOpTime": x["lastOpTime"],
+                    "parentId": fileId,
+                    "fileId": x["id"],
+                    "fileName": x["name"],
+                    "fileSize": x["size"] if type_ == "fileList" else 0,
+                    "fileType": x["name"].split(".")[-1],
+                })
+        return r
 
     def get_file_info(self, fileid, dl=False):
-        r = self.session.get(
-            f"https://cloud.189.cn/v2/getFileInfo.action?fileId={fileid}", timeout=6
-        ).json()
+        try:
+            r = self.session.get(
+                "https://cloud.189.cn/api/open/file/getFileDownloadUrl.action",
+                params={
+                    "fileId": fileid,
+                    "noCache": 0
+                },
+                headers={"Accept": "application/json;charset=UTF-8"},
+                timeout=6
+            ).json()
+        except:
+            return False
         if not dl:
             return r
-        if "downloadUrl" in r:
-            rr = self.session.get("https:" + r["downloadUrl"], allow_redirects=False)
-            return rr.headers["Location"]
+        if "fileDownloadUrl" in r:
+            return r["fileDownloadUrl"]
         return False
