@@ -37,8 +37,8 @@ $ pip install -r requirements.txt
 所有配置文件都位于 `./app/config/` 文件夹中，如下：
 
 - local：本地目录配置项
-- aliyundrive：阿里云盘配置
 - cloud189：天翼云盘配置
+- aliyundrive：阿里云盘配置
 - onedrive：OneDrive 配置
 - switch：插件开关与预处理相关配置
 
@@ -47,16 +47,8 @@ $ pip install -r requirements.txt
 ``` yaml
 # 本地目录配置项，下列字段位于 ./app/config/local.yml
 accounts:
-  Local_A:
-    - "<path_a>"
-  Local_B:
-    - "<path_b>"
-
-# 阿里云盘，下列字段位于 ./app/config/aliyundrive.yml
-# 程序启动时会引导您手动获取 Refresh Token
-accounts:
-  - "AliyunDrive_A"
-  - "AliyunDrive_B"
+  Local_A: "<path_a>"
+  Local_B: "<path_b>"
 
 # 天翼云盘，下列字段位于 ./app/config/cloud189.yml
 accounts:
@@ -67,8 +59,15 @@ accounts:
     - "<your_username>"
     - "<your_password>"
 
+# 阿里云盘，下列字段位于 ./app/config/aliyundrive.yml
+# 程序启动时会引导您手动获取 Refresh Token
+accounts:
+  - "AliyunDrive_A"
+  - "AliyunDrive_B"
+
 # OneDrive，下列字段位于 ./app/config/onedrive.yml
-# 0 为国际版，1 为世纪互联版，程序启动时会引导您手动获取 Refresh Token
+# 程序启动时会引导您手动获取 Refresh Token
+# 0 为国际版，1 为世纪互联版
 accounts:
   OneDrive_INTL: 0
   OneDrive_CN: 1
