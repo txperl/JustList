@@ -12,7 +12,7 @@ from altfe.interface.cloud import interCloud
 class core_local(interCloud):
     def __init__(self):
         super().__init__()
-        self.conf = self.loadConfig(self.getENV("rootPath") + "app/config/local.yml")
+        self.conf = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/local.yml")
         self.conf.update({"sys_dl_urlExpiredTime": -1, "sys_dl_urlExpiredNum": -1})
         self.accounts = self.conf["accounts"]
         self.listOutdated = 0

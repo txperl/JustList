@@ -13,7 +13,7 @@ from app.lib.core.onedrive import onedrive
 class core_onedrive(interCloud):
     def __init__(self):
         super().__init__()
-        self.conf = self.loadConfig(self.getENV("rootPath") + "app/config/onedrive.yml")
+        self.conf = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/onedrive.yml")
         self.api = {}
         self.listOutdated = 0
         self.realID = {}
@@ -23,7 +23,7 @@ class core_onedrive(interCloud):
     def auto(self):
         if self.conf["accounts"] is None:
             return
-        _token = self.loadConfig(self.getENV("rootPath") + "app/config/.token/onedrive.json", default={})
+        _token = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/.token/onedrive.json", default={})
         for u in self.conf["accounts"]:
             if u not in _token:
                 _token[u] = None
@@ -69,7 +69,7 @@ class core_onedrive(interCloud):
         r = {}
         for u in self.api:
             r[u] = self.api[u].refresh_token
-        self.STATIC.file.aout(self.getENV("rootPath") + "app/config/.token/onedrive.json", r)
+        self.STATIC.file.aout(self.getENV("rootPathFrozen") + "app/config/.token/onedrive.json", r)
 
     def load_list(self):
         for u in self.conf["accounts"].copy():

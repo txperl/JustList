@@ -4,6 +4,7 @@ from concurrent.futures import as_completed
 
 from altfe.interface.cloud import interCloud
 from app.lib.core.aliyundrive.aliyundrive import AliyunDrive
+from app.lib.core.onedrive.onedrive import Utils
 
 
 @interCloud.bind("cloud_aliyundrive", "LIB_CORE")
@@ -20,7 +21,7 @@ class core_aliyundrive(interCloud):
     def auto(self):
         if self.conf["accounts"] is None:
             return
-        _token = self.loadConfig(self.getENV("rootPath") + "app/config/.token/aliyundrive.json", default={})
+        _token = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/.token/aliyundrive.json", default={})
         for u in self.conf["accounts"]:
             if u not in _token:
                 print(f"[阿里云盘@{u}] 根据此网址「https://media.cooluc.com/decode_token/」的方法获取 Refresh Token 或 BizExt 以登录")
@@ -60,7 +61,7 @@ class core_aliyundrive(interCloud):
         r = {}
         for u in self.api:
             r[u] = self.api[u].get_token()
-        self.STATIC.file.aout(self.getENV("rootPath") + "app/config/.token/aliyundrive.json", r)
+        self.STATIC.file.aout(self.getENV("rootPathFrozen") + "app/config/.token/aliyundrive.json", r)
 
     def load_list(self):
         for u in self.conf["accounts"].copy():
@@ -104,12 +105,12 @@ class core_aliyundrive(interCloud):
             item = {
                 "isFolder": file["type"] == "folder",
                 "createTime": 0,
-                "lastOpTime": file["updated_at"],
+                "lastOpTime": Utils.formatTime(file["updated_at"]),
                 "parentId": file["parent_file_id"],
                 "fileId": file["file_id"],
                 "filePath": strURI + "/" + file["name"],
                 "fileName": str(file["name"]),
-                "fileSize": file["size"] if file["type"] != "folder" else -1,
+                "fileSize": Utils.getSize(file["size"]) if file["type"] != "folder" else -1,
                 "fileType": None,
                 "child": [],
                 "user": user,

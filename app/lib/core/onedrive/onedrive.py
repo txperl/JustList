@@ -39,11 +39,11 @@ class Utils:
         try:
             size = int(size)
         except:
-            return "unknown"
+            return "Unknown"
         for k, v in cls.sizeUnit:
             if size <= v * 1024:
                 return str("{} {}").format(round(size / v, 2), k)
-        return "unknown"
+        return "Unknown"
 
     @staticmethod
     def getTime(t=0):
