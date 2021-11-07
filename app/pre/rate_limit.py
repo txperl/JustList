@@ -10,7 +10,7 @@ class pre_rate_limit(interRoot):
     """
 
     def __init__(self):
-        self.conf = self.loadConfig(self.getENV("rootPath") + "app/config/switch.yml")
+        self.conf = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/switch.yml")
         self.maxRequests = self.conf["Security"]["rateLimit"]["maxRequests"]
         self.timeSeconds = self.conf["Security"]["rateLimit"]["timeSeconds"]
         self.allowOrigin = self.conf["Security"]["rateLimit"]["allowOrigin"]
@@ -28,9 +28,9 @@ class pre_rate_limit(interRoot):
             return False
         if ip in self.allowOrigin:
             return True
-        visNum = self.CORE.cache.get(f"__rt_{ip}", "visnum", True)
+        visNum = self.INS.cache.get(f"__rt_{ip}", "visnum", True)
         if visNum is None:
-            self.CORE.cache.set(f"__rt_{ip}", "", expire=self.timeSeconds)
+            self.INS.cache.set(f"__rt_{ip}", "", expire=self.timeSeconds)
         elif visNum > self.maxRequests:
             return False
         return True

@@ -21,18 +21,20 @@ class core_onedrive(interCloud):
         self.auto()
 
     def auto(self):
-        _token = self.loadConfig(self.getENV("rootPath") + "app/lib/core/onedrive/.token.json", default={})
+        if self.conf["accounts"] is None:
+            return
+        _token = self.loadConfig(self.getENV("rootPath") + "app/config/.token/onedrive.json", default={})
         for u in self.conf["accounts"]:
             if u not in _token:
                 _token[u] = None
             self.realID[u] = {}
-            is_cn = self.conf["accounts"][u][0]
+            is_cn = self.conf["accounts"][u]
             self.api[u] = onedrive.OneDrive(_token[u],
                                             self.conf["rootPath"],
                                             onedrive.redirectHost[is_cn],
                                             is_cn)
             if _token[u] is None:
-                print(f"[{u}] 进入以下网址以获取 Code 字段")
+                print(f"[OneDrive@{u}] 进入以下网址获取 Code 字段以登录")
                 print(
                     f"{onedrive.oauthHost[is_cn]}/common/oauth2/v2.0/authorize?client_id={onedrive.clientId[is_cn]}&response_type=code&redirect_uri={onedrive.redirectHost[is_cn]}&response_mode=query&scope=offline_access%20User.Read%20Files.ReadWrite.All"
                 )
@@ -50,29 +52,24 @@ class core_onedrive(interCloud):
         while True:
             tim = time.time()
             try:
-                self.__update_token(tim)
+                isUp = False
+                for u in self.api:
+                    if tim > self.api[u].outdated - 600:
+                        self.api[u].getAccessToken()
+                        isUp = True
+                if isUp:
+                    self.__save_refreshToken()
                 if tim > self.listOutdated:
                     self.load_list()
             except Exception as e:
                 self.STATIC.localMsger.error(e)
             time.sleep(self.conf["sys_checkTime"])
 
-    def __update_token(self, tim):
-        isUp = False
-        for u in self.api:
-            if tim > self.api[u].outdated - 600:
-                self.api[u].getAccessToken()
-                isUp = True
-        if isUp:
-            self.__save_refreshToken()
-
     def __save_refreshToken(self):
         r = {}
         for u in self.api:
             r[u] = self.api[u].refresh_token
-        self.STATIC.file.aout(
-            self.getENV("rootPath") + "app/lib/core/onedrive/.token.json", r
-        )
+        self.STATIC.file.aout(self.getENV("rootPath") + "app/config/.token/onedrive.json", r)
 
     def load_list(self):
         for u in self.conf["accounts"].copy():

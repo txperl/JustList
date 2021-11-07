@@ -2,12 +2,14 @@
 # true 为开启，false 为停用
 OnOff:
   core:
-    local: false
+    local: true
       # 本地目录模块
-    cloud189: false
+    cloud189: true
       # 天翼云盘模块
-    onedrive: false
+    onedrive: true
       # onedrive 模块
+    aliyundrive: true
+      # 阿里云盘模块
   pre:
     rate_limit.py: true
       # rate limit 预处理，开启后请修改下方相关配置

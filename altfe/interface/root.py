@@ -15,6 +15,7 @@ class classRoot(object):
     """
     __ENV = {}
     __MODULE = {
+        "LIB_INS": {},
         "LIB_STATIC": {},
         "LIB_COMMON": {},
         "LIB_CORE": {},
@@ -82,7 +83,7 @@ class classRoot(object):
 
     @staticmethod
     def loadConfig(uri, default=False):
-        if not os.path.exists(uri) or (".token.json" in uri and (time.time() - os.path.getmtime(uri) > 3600 * 24)):
+        if not os.path.exists(uri) or ("/.token/" in uri and (time.time() - os.path.getmtime(uri) > 3600 * 24)):
             return default
         with open(uri, "r", encoding="UTF-8") as f:
             sfx = uri.split(".")[-1]

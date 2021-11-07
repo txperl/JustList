@@ -9,19 +9,13 @@ accounts:
   #   - "<your_username>"
   #   - "<your_password>"
   #
-  # 例子（注意缩进）：
+  # 例子：
   # Cloud189_User1:
   #   - "abc@e.com"
   #   - "123456"
   # Cloud189_User2:
   #   - "def@e.com"
   #   - "654321"
-  Cloud189_User1:
-    - "<your_username>"
-    - "<your_password>"
-  Cloud189_User2:
-    - "<your_username>"
-    - "<your_password>"
 
 cant_enterFolder:
   # 加载目录时排除的文件夹名，正则 match

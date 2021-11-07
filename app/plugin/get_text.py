@@ -35,7 +35,7 @@ class do_get_text(interRoot):
 
         # 读取缓存
         key = self.STATIC.util.md5(full + str(argv["id"]) + str(argv["password"]))
-        _link = [self.CORE.cache.get(key), self.CORE.cache.get(key, "visnum"), self.CORE.cache.get(key + "_psw")]
+        _link = [self.INS.cache.get(key), self.INS.cache.get(key, "visnum"), self.INS.cache.get(key + "_psw")]
         if _link[0] is not None:
             if _link[1] <= api.conf["sys_dl_urlExpiredNum"]:
                 if _link[2] == argv["password"]:

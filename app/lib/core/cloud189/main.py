@@ -12,8 +12,7 @@ class core_cloud189(interCloud):
     def __init__(self):
         super().__init__()
         self.conf = self.loadConfig(self.getENV("rootPath") + "app/config/cloud189.yml")
-        _token = self.loadConfig(self.getENV("rootPath") + "app/lib/core/cloud189/.token.json")
-        self.token = _token if _token is not False else {}
+        self.token = self.loadConfig(self.getENV("rootPath") + "app/config/.token/cloud189.json", default={})
         self.listOutdated = 0
         self.api = {}
         self.lock = threading.Lock()
@@ -21,6 +20,8 @@ class core_cloud189(interCloud):
         self.auto()
 
     def auto(self):
+        if self.conf["accounts"] is None:
+            return
         for u in self.conf["accounts"]:
             self.api[u] = cloud189.cloud189(
                 self.conf["accounts"][u][0], self.conf["accounts"][u][1]
@@ -33,7 +34,7 @@ class core_cloud189(interCloud):
                 else self.token[u]["outdated"]
             )
         self.STATIC.file.aout(
-            self.getENV("rootPath") + "app/lib/core/cloud189/.token.json", self.token,
+            self.getENV("rootPath") + "app/config/.token/cloud189.json", self.token,
         )
         t = threading.Timer(0, self.__childth_check)
         t.setDaemon(True)
@@ -62,7 +63,7 @@ class core_cloud189(interCloud):
                 isUp = True
         if isUp:
             self.STATIC.file.aout(
-                self.getENV("rootPath") + "app/lib/core/cloud189/.token.json", self.token,
+                self.getENV("rootPath") + "app/config/.token/cloud189.json", self.token,
             )
 
     def load_list(self):

@@ -2,7 +2,8 @@ import logging
 import os
 import sys
 
-from flask import Flask, jsonify, render_template, abort
+from flask import Flask, jsonify, render_template
+from flask_cors import CORS
 from gevent import monkey
 from gevent.pywsgi import WSGIServer
 
@@ -13,22 +14,19 @@ monkey.patch_all()
 
 app = Flask(__name__)
 
+rootPath = os.path.split(os.path.realpath(sys.argv[0]))[0] + "/"
+rootPathFrozen = sys._MEIPASS + "/" if getattr(sys, "frozen", False) else rootPath
 
 # CORS(app, resources=r"/*")
 
 
 # 路由
-@app.route("/favicon.ico")
-def favicon():
-    return abort(404)
-
-
 @app.route("/")
 def render():
     return render_template("md.html")
 
 
-@app.route("/<path:path>", methods=['GET', 'POST'])
+@app.route("/<path:path>", methods=["GET", "POST"])
 def run(path):
     rep = handle.handleRoute.do(path)
     if type(rep) == dict:
@@ -46,8 +44,9 @@ def run(path):
 
 if __name__ == '__main__':
     # Altfe 框架初始化
-    classRoot.setENV("rootPath", os.path.split(os.path.realpath(sys.argv[0]))[0] + "/")
-    bridge.bridgeInit().run()
+    classRoot.setENV("rootPath", rootPath)
+    classRoot.setENV("rootPathFrozen", rootPathFrozen)
+    bridge.bridgeInit().run(hint=True)
 
     # 调整日志等级
     logging.getLogger("werkzeug").setLevel(logging.ERROR)

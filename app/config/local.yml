@@ -5,16 +5,11 @@ accounts:
   # 可输入多组账号，但自定义名称不可相同
   #
   # 请参考如下格式填写：
-  # <自定义名称>:
-  #   - <本地路径>
+  # <自定义名称>: "<本地路径>"
   #
-  # 例子（注意缩进）：
-  # Local_A:
-  #   - "/Users/txperl/"
-  # Local_B:
-  #   - "C:/Users/txperl/"
-  LocalFile:
-    - "<your_path>"
+  # 例子：
+  # Local_A: "/Users/txperl/"
+  # Local_B: "C:/Users/txperl/"
 
 cant_enterFolder:
   # 加载目录时排除的文件夹名，正则 match

@@ -1,5 +1,3 @@
-# coding=utf-8
-
 import base64
 import pickle
 import threading
@@ -8,8 +6,8 @@ import time
 from altfe.interface.root import interRoot
 
 
-@interRoot.bind("cache", "LIB_CORE")
-class core_module_cache(object):
+@interRoot.bind("cache", "LIB_INS")
+class InsCache(object):
     def __init__(self):
         self._check_time = 5
         self._cache = {}
@@ -85,15 +83,16 @@ class core_module_cache(object):
         self.lock.release()
 
     def __check(self):
-        while True:
-            try:
-                tim = int(time.time())
-                for key in self._cache:
-                    try:
-                        if tim > int(self._cache[key]["ttl"]):
-                            self.delete(key)
-                    except:
-                        continue
-            except:
-                pass
-            time.sleep(self._check_time)
+        try:
+            tim = int(time.time())
+            for key in self._cache:
+                try:
+                    if tim > int(self._cache[key]["ttl"]):
+                        self.delete(key)
+                except:
+                    continue
+        except:
+            pass
+        t = threading.Timer(self._check_time, self.__check)
+        t.setDaemon(True)
+        t.start()

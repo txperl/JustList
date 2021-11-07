@@ -1,16 +1,16 @@
-# OneDrive 配置项
+# 阿里云盘配置项
 
 accounts:
-  # OneDrive 账号
+  # 阿里云盘账号
   # 可输入多组账号，但自定义名称不可相同
   # 程序启动时会引导您手动获取 Refresh Token
   #
   # 请参考如下格式填写：
-  # <自定义名称>: <OneDrive 类型（0 为国际版，1 为世纪互联）>
+  # - "<自定义名称>"
   #
   # 例子：
-  # OneDrive_INTL: 0
-  # OneDrive_CN: 1
+  # - "AliyunDrive_A"
+  # - "AliyunDrive_B"
 
 cant_enterFolder:
   # 加载目录时排除的文件夹名，正则 match

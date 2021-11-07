@@ -21,8 +21,9 @@ class core_local(interCloud):
         self.auto()
 
     def auto(self):
+        if self.accounts is None:
+            return
         for user in self.accounts.copy():
-            self.accounts[user] = self.accounts[user][0]
             self.realID[user] = {}
             if self.accounts[user][-1] != "/":
                 self.accounts[user] += "/"
