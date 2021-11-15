@@ -8,14 +8,13 @@ from app.lib.core.onedrive.onedrive import Utils
 
 
 @interCloud.bind("cloud_aliyundrive", "LIB_CORE")
-class core_aliyundrive(interCloud):
+class CoreAliyunDrive(interCloud):
     def __init__(self):
         super().__init__()
         self.conf = self.INS.conf.dict("aliyundrive")
         self.api = {}
         self.listOutdated = 0
         self.rootPath = [x for x in self.conf["rootPath"].split("/") if x != ""]
-        self.lock = threading.Lock()
         self.auto()
 
     def auto(self):
@@ -50,7 +49,7 @@ class core_aliyundrive(interCloud):
                         self.api[u].do_refresh_token()
                         isUp = True
                 if isUp:
-                    self.__save_refreshToken()
+                    self.__save_token()
                 if tim > self.listOutdated:
                     self.load_list()
             except Exception as e:
@@ -69,7 +68,7 @@ class core_aliyundrive(interCloud):
             tmp = []
             try:
                 self.__pro_load_list(u, tmp)
-                psws = self.STATIC.util.process_addPassword(tmp)
+                psws = interCloud.process_add_password(tmp)
             except Exception as e:
                 self.STATIC.localMsger.error(e)
             else:

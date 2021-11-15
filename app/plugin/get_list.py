@@ -26,7 +26,7 @@ class get_list(interRoot):
             r = {}
             for x in apis:
                 for u in x.list:
-                    r[u] = x.locateAll(u)
+                    r[u] = x.locate_all(u)
             return {"code": 1, "msg": r, }
 
         user = filePath[0]
@@ -46,7 +46,7 @@ class get_list(interRoot):
             else:
                 r = {}
                 for u in api.list:
-                    r[u] = api.locateAll(u)
+                    r[u] = api.locate_all(u)
         else:
             r = api.locate(user, filePath, [x for x in argv["password"].split("._.") if x != ""])
 

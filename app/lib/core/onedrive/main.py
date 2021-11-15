@@ -1,4 +1,3 @@
-# coding=utf-8
 import json
 import threading
 import time
@@ -10,14 +9,13 @@ from app.lib.core.onedrive import onedrive
 
 
 @interCloud.bind("cloud_onedrive", "LIB_CORE")
-class core_onedrive(interCloud):
+class CoreOneDrive(interCloud):
     def __init__(self):
         super().__init__()
-        self.conf = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/onedrive.yml")
+        self.conf = self.INS.conf.dict("onedrive")
         self.api = {}
         self.listOutdated = 0
         self.realID = {}
-        self.lock = threading.Lock()
         self.auto()
 
     def auto(self):
@@ -77,7 +75,7 @@ class core_onedrive(interCloud):
             tmp = []
             try:
                 self.__proLoad_list(u, tmp)
-                psws = self.STATIC.util.process_addPassword(tmp)
+                psws = interCloud.process_add_password(tmp)
             except Exception as e:
                 self.STATIC.localMsger.error(e)
             else:

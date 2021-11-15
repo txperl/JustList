@@ -9,15 +9,14 @@ from altfe.interface.cloud import interCloud
 
 
 @interCloud.bind("cloud_local", "LIB_CORE")
-class core_local(interCloud):
+class CoreLocal(interCloud):
     def __init__(self):
         super().__init__()
-        self.conf = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/local.yml")
+        self.conf = self.INS.conf.dict("local")
         self.conf.update({"sys_dl_urlExpiredTime": -1, "sys_dl_urlExpiredNum": -1})
         self.accounts = self.conf["accounts"]
         self.listOutdated = 0
         self.realID = {}
-        self.lock = threading.Lock()
         self.auto()
 
     def auto(self):
@@ -45,7 +44,7 @@ class core_local(interCloud):
             tmp = []
             try:
                 self.__proLoad_list(u, tmp, self.accounts[u])
-                psws = self.STATIC.util.process_addPassword(tmp)
+                psws = interCloud.process_add_password(tmp)
             except Exception as e:
                 self.STATIC.localMsger.error(e)
             else:

@@ -1,4 +1,3 @@
-# coding=utf-8
 import threading
 import time
 from concurrent.futures import as_completed
@@ -8,14 +7,13 @@ from app.lib.core.cloud189 import cloud189
 
 
 @interCloud.bind("cloud_189", "LIB_CORE")
-class core_cloud189(interCloud):
+class CoreCloud189(interCloud):
     def __init__(self):
         super().__init__()
-        self.conf = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/cloud189.yml")
+        self.conf = self.INS.conf.dict("cloud189")
         self.token = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/.token/cloud189.json", default={})
         self.listOutdated = 0
         self.api = {}
-        self.lock = threading.Lock()
         self.rootPath = [x for x in self.conf["rootPath"].split("/") if x != ""]
         self.auto()
 
@@ -72,7 +70,7 @@ class core_cloud189(interCloud):
             tmp = []
             try:
                 self.__proLoad_list(user, tmp, -11, str(user) + "/", 0)
-                psws = self.STATIC.util.process_addPassword(tmp)
+                psws = interCloud.process_add_password(tmp)
             except Exception as e:
                 self.STATIC.localMsger.error(e)
             else:
