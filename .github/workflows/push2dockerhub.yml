@@ -14,6 +14,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      
+      - name: Set up QEMU
+        if: ${{ steps.prepare.outputs.dockerhub_version != steps.prepare.outputs.github_version }}
+        uses: docker/setup-qemu-action@v1
+
+      - name: Set up Docker Buildx
+        if: ${{ steps.prepare.outputs.dockerhub_version != steps.prepare.outputs.github_version }}
+        uses: docker/setup-buildx-action@v1
 
       - name: Docker Login
         uses: docker/login-action@v1.10.0
@@ -22,10 +30,16 @@ jobs:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
           logout: true
-
+      
+      #- name: Login To Alibaba Cloud Container Registry
+      #  run: |
+      #    docker login -u ${{ secrets.ALIYUN_USERNAME }} -p ${{ secrets.ALIYUN_PWD }} ${{ secrets.ALIYUN_ADDRESS }}
+      
       - name: Build and Push Image
-        env:
-          IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME }}/justlist:${{ github.event.inputs.tag }}
-        run: |
-          docker build -t $IMAGE_NAME .
-          docker push $IMAGE_NAME
+        uses: docker/build-push-action@v2
+        with:
+          platforms: linux/amd64,linux/arm64
+          file: ./Dockerfile
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_HUB_USERNAME }}/justlist:${{ github.event.inputs.tag }}
