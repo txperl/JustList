@@ -148,4 +148,10 @@ class CoreOneDrive(interCloud):
             return self.api[user].get_file_info(self.realID[user][fid], dl)
         except Exception as e:
             self.STATIC.localMsger.error(e)
-            return False
+            self.STATIC.localMsger.green(f"[OneDrive] {user} try to login")
+            try:
+                self.api[user].getAccessToken()
+                return self.api[user].get_file_info(self.realID[user][fid], dl)
+            except Exception as ee:
+                self.STATIC.localMsger.error(ee)
+        return False

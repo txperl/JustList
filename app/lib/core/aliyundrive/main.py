@@ -130,4 +130,10 @@ class CoreAliyunDrive(interCloud):
             return self.api[user].get_download_url(fid)
         except Exception as e:
             self.STATIC.localMsger.error(e)
-            return False
+            self.STATIC.localMsger.green(f"[AliyunDrive] {user} try to login")
+            try:
+                self.api[user].do_refresh_token()
+                return self.api[user].get_download_url(fid)
+            except Exception as ee:
+                self.STATIC.localMsger.error(ee)
+        return False

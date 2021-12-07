@@ -44,6 +44,7 @@ class AliyunDrive:
             },
         ).json()
         if "access_token" not in rep:
+            print(rep)
             return False
         self._token.update({
             "refresh": rep["refresh_token"],

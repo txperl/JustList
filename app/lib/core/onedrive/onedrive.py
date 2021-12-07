@@ -183,6 +183,7 @@ class OneDrive:
             self.outdated = time.time() + resp["expires_in"]
             return resp
         else:
+            print(resp)
             raise Exception("Error, Get Access Token.")
 
     def get_file_info(self, fId, dl):

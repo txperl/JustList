@@ -133,9 +133,10 @@ class CoreCloud189(interCloud):
             return self.api[user].get_file_info(fId, dl)
         except Exception as e:
             self.STATIC.localMsger.error(e)
-            self.api[user].login()
+            self.STATIC.localMsger.green(f"[Cloud189] {user} try to login")
             try:
+                self.api[user].login()
                 return self.api[user].get_file_info(fId, dl)
             except Exception as ee:
                 self.STATIC.localMsger.error(ee)
-                return False
+        return False

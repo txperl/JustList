@@ -150,7 +150,7 @@ class cloud189(object):
             return self.session.cookies.get_dict()
         else:
             print(msg)
-            os._exit(0)
+            return False
 
     def get_file_size_str(self, filesize: int) -> str:
         if 0 < filesize < 1024 ** 2:
