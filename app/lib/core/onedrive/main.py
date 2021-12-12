@@ -49,18 +49,19 @@ class CoreOneDrive(interCloud):
     def __childth_check(self):
         while True:
             tim = time.time()
-            try:
-                isUp = False
-                for u in self.api:
-                    if tim > self.api[u].outdated - 600:
+            isUP = False
+            for u in self.api:
+                if tim > self.api[u].outdated - 600:
+                    try:
                         self.api[u].getAccessToken()
-                        isUp = True
-                if isUp:
-                    self.__save_refreshToken()
-                if tim > self.listOutdated:
-                    self.load_list()
-            except Exception as e:
-                self.STATIC.localMsger.error(e)
+                    except Exception as e:
+                        self.STATIC.localMsger.error(e)
+                    else:
+                        isUP = True
+            if isUP:
+                self.__save_refreshToken()
+            if tim > self.listOutdated:
+                self.load_list()
             time.sleep(self.conf["sys_checkTime"])
 
     def __save_refreshToken(self):

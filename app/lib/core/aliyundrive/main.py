@@ -42,18 +42,19 @@ class CoreAliyunDrive(interCloud):
     def __check(self):
         while True:
             tim = time.time()
-            try:
-                isUp = False
-                for u in self.api:
-                    if tim > self.api[u].get_token("expire") - 600:
+            isUP = False
+            for u in self.api:
+                if tim > self.api[u].get_token("expire") - 600:
+                    try:
                         self.api[u].do_refresh_token()
-                        isUp = True
-                if isUp:
-                    self.__save_token()
-                if tim > self.listOutdated:
-                    self.load_list()
-            except Exception as e:
-                self.STATIC.localMsger.error(e)
+                    except Exception as e:
+                        self.STATIC.localMsger.error(e)
+                    else:
+                        isUP = True
+            if isUP:
+                self.__save_token()
+            if tim > self.listOutdated:
+                self.load_list()
             time.sleep(self.conf["sys_checkTime"])
 
     def __save_token(self):

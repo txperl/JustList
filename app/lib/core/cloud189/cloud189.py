@@ -143,6 +143,7 @@ class cloud189(object):
                 "mailSuffix": "@189.cn",
                 "paramId": paramId,
             },
+            timeout=6
         )
         msg = r.json()["msg"]
         if msg == "登录成功":

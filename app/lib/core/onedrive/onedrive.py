@@ -96,7 +96,7 @@ class Utils:
         else:
             opener = request.build_opener(RedirectHandler)
         try:
-            res_obj = opener.open(url_obj, timeout=10)
+            res_obj = opener.open(url_obj, timeout=6)
         except error.HTTPError as err:
             res_obj = err
         return res_obj

@@ -42,6 +42,7 @@ class AliyunDrive:
                 "refresh_token": refreshToken,
                 "grant_type": "refresh_token",
             },
+            timeout=6
         ).json()
         if "access_token" not in rep:
             print(rep)
@@ -75,6 +76,7 @@ class AliyunDrive:
                 "order_direction": "ASC",
                 "parent_file_id": parentFileID,
             },
+            timeout=6
         ).json()
         if rep.get("code") == "AccessTokenInvalid":
             if self.do_refresh_token():
@@ -92,6 +94,7 @@ class AliyunDrive:
                 "drive_id": self.get_token("drive_id"),
                 "file_id": fileID,
             },
+            timeout=6
         ).json()
         return rep.get("url")
 

@@ -53,12 +53,16 @@ class CoreCloud189(interCloud):
         isUp = False
         for u in self.conf["accounts"]:
             if tim > self.token[u]["outdated"]:
-                tmp = self.api[u].login(self.token[u])
-                tmp["outdated"] = time.time() + self.conf["sys_tokenExpiredTime"]
-                self.lock.acquire()
-                self.token[u] = tmp
-                self.lock.release()
-                isUp = True
+                try:
+                    tmp = self.api[u].login(self.token[u])
+                except Exception as e:
+                    self.STATIC.localMsger.error(e)
+                else:
+                    tmp["outdated"] = time.time() + self.conf["sys_tokenExpiredTime"]
+                    self.lock.acquire()
+                    self.token[u] = tmp
+                    self.lock.release()
+                    isUp = True
         if isUp:
             self.STATIC.file.aout(
                 self.getENV("rootPathFrozen") + "app/config/.token/cloud189.json", self.token,
