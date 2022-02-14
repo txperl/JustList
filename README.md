@@ -146,7 +146,6 @@ $ python main.py
 ├── ├── plugin                      # 插件模块，当收到请求后会被实例化并执行
 ├── ├── ├── do_file.py                # 直链跳转
 ├── ├── ├── get_list.py               # 目录获取
-├── ├── ├── get_text.py               # 文本文件内容获取
 ├── ├── ├── sys_update.py             # 强制刷新缓存
 ├── templates                       # 前端主题
 ├── ├── md.html
@@ -157,7 +156,7 @@ $ python main.py
 
 此部分可自行修改插件以更改。
 
-1. 目录获取
+1. **目录获取**
   + `[POST] api/get/list/`
   + `api/get/list/` : 返回全部目录
   + `api/get/list/user1/` : 返回 user 1 的全部目录
@@ -169,16 +168,14 @@ $ python main.py
       + `id` : 文件 ID
       + `password` : 目录密码（可选）
 
-2. 文本文件内容获取
-  + `[POST] api/get/text/`
-  + 同上，仅需将 `api/get/list/` 替换为 `api/get/text/` 即可
-  + 仅支持 `.txt` 与 `.md` 格式文件
+2. **文件下载**
 
-3. 文件下载
   + `[GET] file/`
-  + 同上，仅需将 `api/get/list/` 替换为 `file/` 即可
+  + `file/user1/a/b/` : 返回 user1 的 a 目录下的 b 文件地址（如果存在）
+  + `file/user2/?id=xxx` : 返回 user2 的 id 为 xxx 的文件地址
+  + `file/user3/?id=xxx&password=psw` : 返回 user3 的 id 为 xxx 的文件地址，且访问密码为 psw
 
-4. `强制刷新目录缓存@[GET] sys/update/xxxiiixxx/`
+3. `强制刷新目录缓存@[GET] sys/update/xxxiiixxx/`
 
 ## 说明
 

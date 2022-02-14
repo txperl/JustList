@@ -77,7 +77,8 @@ class CoreLocal(interCloud):
                 "fileType": None,
                 "child": [],
                 "user": user,
-                "isSecret": False
+                "isSecret": False,
+                "driveName": "local"
             }
             if not item["isFolder"]:
                 item["fileType"] = item["fileName"].split(".")[-1]

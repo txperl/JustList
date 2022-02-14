@@ -114,7 +114,8 @@ class CoreAliyunDrive(interCloud):
                 "fileType": None,
                 "child": [],
                 "user": user,
-                "isSecret": False
+                "isSecret": False,
+                "driveName": "aliyundrive"
             }
             if not item["isFolder"]:
                 item["fileType"] = str(item["fileName"]).split(".")[-1]

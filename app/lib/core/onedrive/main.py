@@ -127,7 +127,8 @@ class CoreOneDrive(interCloud):
                 "fileType": None,
                 "child": [],
                 "user": user,
-                "isSecret": False
+                "isSecret": False,
+                "driveName": "onedrive"
             }
             if not item["isFolder"]:
                 item["fileType"] = str(file["name"]).split(".")[-1]

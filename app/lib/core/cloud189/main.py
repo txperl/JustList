@@ -119,7 +119,8 @@ class CoreCloud189(interCloud):
                 "fileType": None,
                 "child": [],
                 "user": user,
-                "isSecret": False
+                "isSecret": False,
+                "driveName": "cloud189"
             }
             if not file["isFolder"]:
                 item["fileSize"] = self.api[user].get_file_size_str(file["fileSize"])

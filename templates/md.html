@@ -321,7 +321,6 @@
     <script src="//cdn.jsdelivr.net/npm/v-viewer@1.5.1/dist/v-viewer.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
     <script>
-        version = 3;
         tmp = {}; // 全局暂留
 
         Vue.use(VueLazyload, {
@@ -353,7 +352,7 @@
                         "video": ["ondemand_video", "mp4", "mkv", "wmv", "avi", "mov", "webm"],
                         "img": ["image", "bmp", "jpg", "jpeg", "png", "gif", "webp"],
                         "audio": ["audiotrack", "mp3", "aac"],
-                        "text": ["description", "md", "txt", "json"],
+                        "text": ["description", "md", "txt", "json", "yml", "yaml"],
                         "archive": ["archive", "zip", "rar", "7z", "tar"],
                         "other": "insert_drive_file"
                     }
@@ -367,20 +366,18 @@
                 // 获取数据
                 const salt = localStorage.getItem("cloud_salt");
                 const outdated = localStorage.getItem("cloud_outdated");
-                const tmpversion = localStorage.getItem("cloud_version");
                 const vm = this;
                 window.addEventListener("hashchange", (event) => {
                     const to_ = event.newURL.split(vm.root_url + "/#")[1];
                     vm.toPath(to_ ? to_ : "");
                 });
                 localforage.getItem("cloud_list").then((data) => {
-                    if (data == null || salt == null || outdated == null || tmpversion == null || tmpversion < version || outdated <= Date.parse(new Date())) {
+                    if (data == null || salt == null || outdated == null || outdated <= Date.parse(new Date())) {
                         vm.refresh(false);
                         axios.post(`${vm.api_url}/api/get/list/`, {})
                             .then(function (rep) {
                                 localStorage.setItem('cloud_salt', dcodeIO.bcrypt.genSaltSync(10));
-                                localStorage.setItem('cloud_outdated', Date.parse(new Date()) + 600000);
-                                localStorage.setItem('cloud_version', version);
+                                localStorage.setItem('cloud_outdated', Date.parse(new Date()) + 300000);
                                 localforage.setItem('cloud_list', JSON.stringify(rep["data"]["msg"])).then((val) => {
                                     vm.load_data(vm, val);
                                     vm.toPath(window.location.hash);
@@ -597,7 +594,6 @@
                         if (x1 > x2) return 1;
                         return 0;
                     }
-
                     let r = {};
                     try {
                         r = arr.slice().sort(func);
@@ -611,22 +607,20 @@
                     let may, type;
                     this.more._f = this.temp._f;
                     paths = path.split('/');
-                    // /#/type/user/id
-                    // type: list, file
-                    // user: of users
-                    // id: file id
                     if (paths.length === 4) {
+                        // /#/type/user/id
+                        // type: list, file
+                        // user: of users
+                        // id: file id
                         type = paths[1];
                         const user = paths[2];
                         const id = paths[3];
-
                         if (id === -11) {
                             this.paths = [{ id: -11, name: "~" }];
                             this.files = this.file_list_data[user];
                             this.more._u = user;
                             return;
                         }
-
                         may = this.locate_id(user, id);
                         if (may.end != null) {
                             if (type === 'list') {
@@ -645,10 +639,10 @@
                         } else {
                             window.location.href = this.root_url;
                         }
+                    } else if (paths.length === 3) {
                         // /#/type/key
                         // type: search
                         // key: keyword
-                    } else if (paths.length === 3) {
                         type = paths[1];
                         let key = decodeURI(paths[2]);
                         may = this.search(key);
@@ -668,32 +662,27 @@
                     }
 
                     this.more._f["fileMaybeURL"] = this.api_url + '/file/' + this.more._u + '/?id=' + this.more._f.fileId
-
                     if (!this.more._f.isFolder && this.more._f.filePassword)
                         this.more._f["fileMaybeURL"] += '&password=' + this.more._f.filePassword
 
                     // 加载 more._f 的文件内容（如果有）
                     if (!this.more._f["isFolder"] && this.more.format_support.text.indexOf(this.more._f["fileType"]) !== -1) {
-                        const key = "cache_text_" + String(this.more._f["fileId"]);
-                        const file = null;
-                        // const file = localStorage.getItem(key);
-                        if (file == null) {
-                            const vm = this;
-                            let data = { id: this.more._f["fileId"] };
-                            if (this.more._f.filePassword)
-                                data["password"] = this.more._f.filePassword
-                            vm.$set(vm.more._f, 'data', 'loading...');
-                            axios.post(`${this.api_url}/api/get/text/${this.more._f["user"]}/`, data)
-                                .then(function (rep) {
-                                    // localStorage.setItem(key, rep['data']);
-                                    vm.$set(vm.more._f, 'data', rep['data']);
-                                })
-                                .catch(function (error) {
-                                    vm.$set(vm.more._f, 'data', ': ( 预览获取失败了');
-                                })
-                        } else {
-                            this.$set(this.more._f, "data", file);
+                        if (this.more._f["driveName"] === "cloud189") {
+                            this.$set(this.more._f, 'data', '😣 天翼云盘不支持文本预览...');
+                            return;
                         }
+                        const vm = this;
+                        let data = { id: this.more._f["fileId"] };
+                        if (this.more._f.filePassword)
+                            data["password"] = this.more._f.filePassword
+                        vm.$set(vm.more._f, 'data', '👀 loading...');
+                        axios.get(`${this.api_url}/file/${this.more._f["user"]}/`, { params: data })
+                            .then(function (rep) {
+                                vm.$set(vm.more._f, 'data', rep['data']);
+                            })
+                            .catch(function (error) {
+                                vm.$set(vm.more._f, 'data', '😣 预览获取失败了...');
+                            })
                     }
                 },
                 locate_id: function (user, fid) {
