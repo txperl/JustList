@@ -4,7 +4,6 @@ from concurrent.futures import as_completed
 
 from altfe.interface.cloud import interCloud
 from app.lib.core.aliyundrive.aliyundrive import AliyunDrive
-from app.lib.core.onedrive.onedrive import Utils
 
 
 @interCloud.bind("cloud_aliyundrive", "LIB_CORE")
@@ -105,12 +104,12 @@ class CoreAliyunDrive(interCloud):
             item = {
                 "isFolder": file["type"] == "folder",
                 "createTime": 0,
-                "lastOpTime": Utils.formatTime(file["updated_at"]),
+                "lastOpTime": self.STATIC.util.format_time(file["updated_at"]),
                 "parentId": file["parent_file_id"],
                 "fileId": file["file_id"],
                 "filePath": strURI + "/" + file["name"],
                 "fileName": str(file["name"]),
-                "fileSize": Utils.getSize(file["size"]) if file["type"] != "folder" else -1,
+                "fileSize": self.STATIC.util.format_size(file["size"]) if file["type"] != "folder" else -1,
                 "fileType": None,
                 "child": [],
                 "user": user,

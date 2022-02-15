@@ -1,11 +1,9 @@
-import json
 import threading
 import time
 from concurrent.futures import as_completed
-from urllib import parse
 
 from altfe.interface.cloud import interCloud
-from app.lib.core.onedrive import onedrive
+from app.lib.core.onedrive.onedrive import OneDrive
 
 
 @interCloud.bind("cloud_onedrive", "LIB_CORE")
@@ -13,7 +11,6 @@ class CoreOneDrive(interCloud):
     def __init__(self):
         super().__init__()
         self.conf = self.INS.conf.dict("onedrive")
-        self.api = {}
         self.listOutdated = 0
         self.realID = {}
         self.auto()
@@ -23,25 +20,23 @@ class CoreOneDrive(interCloud):
             return
         _token = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/.token/onedrive.json", default={})
         for u in self.conf["accounts"]:
-            if u not in _token:
-                _token[u] = None
-            self.realID[u] = {}
-            is_cn = self.conf["accounts"][u]
-            self.api[u] = onedrive.OneDrive(_token[u],
-                                            self.conf["rootPath"],
-                                            onedrive.redirectHost[is_cn],
-                                            is_cn)
-            if _token[u] is None:
-                print(f"[OneDrive@{u}] 进入以下网址获取 Code 字段以登录")
+            class_one = OneDrive(is_cn=int(self.conf["accounts"][u]))
+            func_body = {}
+            if _token.get(u) is None or _token.get(u).get("refresh") is None:
+                print(f"[OneDrive] {u} 请进入以下地址获取 Code 以登录")
                 print(
-                    f"{onedrive.oauthHost[is_cn]}/common/oauth2/v2.0/authorize?client_id={onedrive.clientId[is_cn]}&response_type=code&redirect_uri={onedrive.redirectHost[is_cn]}&response_mode=query&scope=offline_access%20User.Read%20Files.ReadWrite.All"
-                )
-                print("Code 为跳转后 URL 的 ?code= 到 &session_state 的中间部分")
+                    f"{class_one.oauth_host}/common/oauth2/v2.0/authorize?client_id={class_one.client_id}&response_type=code&redirect_uri={class_one.redirect_host}&response_mode=query&scope=offline_access%20User.Read%20Files.ReadWrite.All")
+                print("Code 为跳转后网址的 ?code= 到 &session_state 的中间部分")
                 code = str(input("Code: ").strip())
-                self.api[u].getToken(code)
+                func_body.update({"code": code})
             else:
-                self.api[u].getAccessToken()
-        self.__save_refreshToken()
+                func_body.update({"refresh_token": _token.get(u).get("refresh")})
+            if class_one.do_refresh_token(**func_body):
+                self.api[u] = class_one
+                self.realID[u] = {}
+                self.__save_token()
+            else:
+                print(f"[OneDrive] {u} 登录失败")
         t = threading.Timer(0, self.__childth_check)
         t.setDaemon(True)
         t.start()
@@ -51,27 +46,27 @@ class CoreOneDrive(interCloud):
             tim = time.time()
             isUP = False
             for u in self.api:
-                if tim > self.api[u].outdated - 600:
+                if tim > self.api[u].get_token("expire") - 600:
                     try:
-                        self.api[u].getAccessToken()
+                        self.api[u].do_refresh_token()
                     except Exception as e:
                         self.STATIC.localMsger.error(e)
                     else:
                         isUP = True
             if isUP:
-                self.__save_refreshToken()
+                self.__save_token()
             if tim > self.listOutdated:
                 self.load_list()
             time.sleep(self.conf["sys_checkTime"])
 
-    def __save_refreshToken(self):
+    def __save_token(self):
         r = {}
         for u in self.api:
-            r[u] = self.api[u].refresh_token
+            r[u] = self.api[u].get_token()
         self.STATIC.file.aout(self.getENV("rootPathFrozen") + "app/config/.token/onedrive.json", r)
 
     def load_list(self):
-        for u in self.conf["accounts"].copy():
+        for u in self.api:
             self.inCheck = True
             tmp = []
             try:
@@ -91,18 +86,10 @@ class CoreOneDrive(interCloud):
 
     def __proLoad_list(self, user, arr, path=None):
         if path is None:
-            path = self.api[user].RootPath
-        url = str(
-            onedrive.apiHost[self.api[user].IS_CN]
-            + "/v1.0/me/drive/root{}?expand=children($select=name,size,file,folder,parentReference,lastModifiedDateTime)"
-        ).format(parse.quote(self.api[user].drivePath(path)))
-        page = onedrive.Utils.http(
-            url, headers=self.api[user].getHeader(self.api[user].access_token)
-        )
-        data = json.loads(page.read().decode())
-        if "error" in data:
-            self.STATIC.localMsger.error(data["error"]["message"])
-            return
+            path = self.conf["rootPath"]
+        data = self.api[user].get_list(path)
+        if "children" not in data:
+            return []
         status = []
         for file in data["children"]:
             # 过滤排除的文件夹/文件
@@ -112,7 +99,7 @@ class CoreOneDrive(interCloud):
             item = {
                 "isFolder": "folder" in file,
                 "createTime": 0,
-                "lastOpTime": onedrive.Utils.formatTime(
+                "lastOpTime": self.STATIC.util.format_time(
                     file["lastModifiedDateTime"]
                 ),
                 "parentId": self.STATIC.util.md5(file["parentReference"]["path"]),
@@ -123,7 +110,7 @@ class CoreOneDrive(interCloud):
                     "/drive/root:", user
                 ),
                 "fileName": str(file["name"]),
-                "fileSize": onedrive.Utils.getSize(file["size"]),
+                "fileSize": self.STATIC.util.format_size(file["size"]),
                 "fileType": None,
                 "child": [],
                 "user": user,
@@ -147,13 +134,13 @@ class CoreOneDrive(interCloud):
 
     def info(self, user, fid, dl=False):
         try:
-            return self.api[user].get_file_info(self.realID[user][fid], dl)
+            return self.api[user].get_download_url(self.realID[user][fid])
         except Exception as e:
             self.STATIC.localMsger.error(e)
             self.STATIC.localMsger.green(f"[OneDrive] {user} try to login")
             try:
-                self.api[user].getAccessToken()
-                return self.api[user].get_file_info(self.realID[user][fid], dl)
+                self.api[user].do_refresh_token()
+                return self.api[user].get_download_url(self.realID[user][fid])
             except Exception as ee:
                 self.STATIC.localMsger.error(ee)
         return False

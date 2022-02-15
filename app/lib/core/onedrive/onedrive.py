@@ -1,201 +1,98 @@
-# -*- encoding: utf-8 -*-
-# Author:  MoeClub.org, github.com/txperl
-
-import json
 import time
-from urllib import request, error, parse
+from urllib import parse
 
-clientId = [
-    "78d4dc35-7e46-42c6-9023-2d39314433a5",
-    "dfe36e60-6133-48cf-869f-4d15b8354769",
-]
-clientSecret = [
-    "ZudGl-p.m=LMmr3VrKgAyOf-WevB3p50",
-    "H0-1:6.Sb8:WCW/J-c]K@fddCt[i0EZ2",
-]
-oauthHost = [
-    "https://login.microsoftonline.com",
-    "https://login.partner.microsoftonline.cn",
-]
-apiHost = ["https://graph.microsoft.com", "https://microsoftgraph.chinacloudapi.cn"]
-redirectHost = ["http://localhost/onedrive-login", "http://localhost/onedrive-login"]
+import requests
 
 
-class Utils:
-    sizeUnit = (
-        ("B", 2 ** 0),
-        ("KB", 2 ** 10),
-        ("MB", 2 ** 20),
-        ("GB", 2 ** 30),
-        ("TB", 2 ** 40),
-        ("PB", 2 ** 50),
-        ("EB", 2 ** 60),
-        ("ZB", 2 ** 70),
-        ("YB", 2 ** 80),
-    )
+class OneDrive(object):
+    CLIENT_ID = ["78d4dc35-7e46-42c6-9023-2d39314433a5", "dfe36e60-6133-48cf-869f-4d15b8354769"]
+    CLIENT_SECRET = ["ZudGl-p.m=LMmr3VrKgAyOf-WevB3p50", "H0-1:6.Sb8:WCW/J-c]K@fddCt[i0EZ2"]
+    OAUTH_HOST = ["https://login.microsoftonline.com", "https://login.partner.microsoftonline.cn"]
+    API_HOST = ["https://graph.microsoft.com", "https://microsoftgraph.chinacloudapi.cn"]
+    REDIRECT_HOST = ["http://localhost/onedrive-login", "http://localhost/onedrive-login"]
 
-    @classmethod
-    def getSize(cls, size):
-        try:
-            size = int(size)
-        except:
-            return "Unknown"
-        for k, v in cls.sizeUnit:
-            if size <= v * 1024:
-                return str("{} {}").format(round(size / v, 2), k)
-        return "Unknown"
-
-    @staticmethod
-    def getTime(t=0):
-        if t <= 0:
-            return int(time.time())
-        else:
-            return int(int(time.time()) - t)
-
-    @staticmethod
-    def formatTime(s="", f="%Y-%m-%d %H:%M:%S"):
-        s_ = str(s)
-        try:
-            return time.strftime(f, time.strptime(s_, "%Y-%m-%dT%H:%M:%SZ"))
-        except:
-            try:
-                return time.strftime(f, time.strptime(s_, "%Y-%m-%dT%H:%M:%S.%fZ"))
-            except:
-                return "Unknown"
-
-    @staticmethod
-    def http(url, method="GET", headers=None, data=None, coding="utf-8", redirect=True):
-        method = str(method).strip().upper()
-        method_allow = ["GET", "HEAD", "POST", "PUT", "DELETE"]
-        if method not in method_allow:
-            raise Exception(str("HTTP Method Not Allowed [{}].").format(method))
-
-        class RedirectHandler(request.HTTPRedirectHandler):
-            def http_error_302(self, req, fp, code, msg, headers):
-                pass
-
-            http_error_301 = http_error_303 = http_error_307 = http_error_302
-
-        if headers:
-            _headers = headers.copy()
-        else:
-            _headers = {"User-Agent": "Mozilla/5.0", "Accept-Encoding": ""}
-        if data is not None and method in ["POST", "PUT"]:
-            if isinstance(data, (dict, list)):
-                data = json.dumps(data)
-            data = str(data).encode(coding)
-            if "content-length" not in [
-                str(item).lower() for item in list(_headers.keys())
-            ]:
-                _headers["Content-Length"] = str(len(data))
-        else:
-            data = None
-        url_obj = request.Request(url, method=method, data=data, headers=_headers)
-        if redirect:
-            opener = request.build_opener()
-        else:
-            opener = request.build_opener(RedirectHandler)
-        try:
-            res_obj = opener.open(url_obj, timeout=6)
-        except error.HTTPError as err:
-            res_obj = err
-        return res_obj
-
-
-class OneDrive:
-    def __init__(self, refreshToken, rootPath="", redirectUri=redirectHost[0], IS_CN=0):
-        self.IS_CN = IS_CN
-        self.RootPath = rootPath
-        self.redirect_uri = redirectUri
-        self.refresh_token = refreshToken
-        self.access_token = ""
-        self.outdated = 0
-
-    @staticmethod
-    def accessData(grantType, redirectUri=redirectHost[0], IS_CN=0):
-        return {
-            "client_id": clientId[IS_CN],
-            "client_secret": clientSecret[IS_CN],
-            "redirect_uri": redirectUri,
-            "grant_type": grantType,
-            "scope": "User.Read Files.ReadWrite.All offline_access",
+    def __init__(self, is_cn=0):
+        self.client_id = OneDrive.CLIENT_ID[is_cn]
+        self.client_secret = OneDrive.CLIENT_SECRET[is_cn]
+        self.oauth_host = OneDrive.OAUTH_HOST[is_cn]
+        self.api_host = OneDrive.API_HOST[is_cn]
+        self.redirect_host = OneDrive.REDIRECT_HOST[is_cn]
+        self._token = {
+            "refresh": "",
+            "access": "",
+            "expire": 0
         }
 
-    @staticmethod
-    def drivePath(path):
-        path = str(path).strip(":").split(":", 1)[-1]
-        while "//" in path:
-            path = str(path).replace("//", "/")
-        if path == "/":
-            return path
-        else:
-            return str(":/{}:").format(str(path).strip("/"))
-
-    @staticmethod
-    def getHeader(accessToken=""):
-        _header = {
+    def gen_header(self, access_token=None):
+        header = {
             "User-Agent": "ISV|OneList/1.1",
             "Accept": "application/json; odata.metadata=none",
         }
-        if accessToken:
-            _header["Authorization"] = str("Bearer {}").format(accessToken)
-        return _header
+        if access_token is not None:
+            header.update({"Authorization": "Bearer " + access_token})
+        return header
 
-    def getToken(self, respCode):
-        data = self.accessData(
-            "authorization_code", redirectHost[self.IS_CN], self.IS_CN
-        )
-        data["code"] = respCode
-        Data = "&".join([str("{}={}").format(item, data[item]) for item in data])
-        page = Utils.http(
-            oauthHost[self.IS_CN] + "/common/oauth2/v2.0/token",
-            "POST",
-            data=Data,
-            headers=self.getHeader(),
-        )
-        resp = json.loads(page.read().decode())
-        if "refresh_token" in resp and "access_token" in resp:
-            self.access_token = resp["access_token"]
-            self.refresh_token = resp["refresh_token"]
-            self.outdated = time.time() + resp["expires_in"]
-        else:
-            raise Exception("Error, Get Refresh Token.")
+    def gen_data(self, grant_type):
+        return {
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+            "redirect_uri": self.redirect_host,
+            "grant_type": grant_type,
+            "scope": "User.Read Files.ReadWrite.All offline_access",
+        }
 
-    def getAccessToken(self, refreshToken=None):
-        data = self.accessData(
-            "refresh_token", redirectHost[self.IS_CN], IS_CN=self.IS_CN
-        )
-        if refreshToken is None:
-            data["refresh_token"] = self.refresh_token
+    def gen_path(self, path):
+        _path = str(path).strip(":").split(":", 1)[-1]
+        while "//" in _path:
+            _path = str(_path).replace("//", "/")
+        if _path == "/":
+            return _path
         else:
-            data["refresh_token"] = refreshToken
-        Data = "&".join([str("{}={}").format(item, data[item]) for item in data])
-        page = Utils.http(
-            oauthHost[self.IS_CN] + "/common/oauth2/v2.0/token",
-            "POST",
-            data=Data,
-            headers=self.getHeader(),
-        )
-        resp = json.loads(page.read().decode())
-        if "refresh_token" in resp and "access_token" in resp:
-            self.access_token = resp["access_token"]
-            self.refresh_token = resp["refresh_token"]
-            self.outdated = time.time() + resp["expires_in"]
-            return resp
-        else:
-            print(resp)
-            raise Exception("Error, Get Access Token.")
+            return str(":/{}:").format(str(_path).strip("/"))
 
-    def get_file_info(self, fId, dl):
-        path = fId
+    def do_refresh_token(self, code=None, refresh_token=None):
+        if code is None and refresh_token is None:
+            refresh_token = self.get_token(key="refresh")
+        if code is not None:
+            req_data = self.gen_data("authorization_code")
+            req_data.update({"code": code})
+        else:
+            req_data = self.gen_data("refresh_token")
+            req_data.update({"refresh_token": refresh_token})
+        rep = requests.post(url=self.oauth_host + "/common/oauth2/v2.0/token",
+                            data="&".join([str("{}={}").format(item, req_data[item]) for item in req_data]),
+                            headers=self.gen_header(),
+                            timeout=6).json()
+        if "refresh_token" not in rep or "access_token" not in rep:
+            print(rep)
+            return False
+        self._token.update({
+            "refresh": rep["refresh_token"],
+            "access": rep["access_token"],
+            "expire": time.time() + rep["expires_in"]
+        })
+        return True
+
+    def get_token(self, key=None):
+        if key is None:
+            return self._token.copy()
+        if key in self._token:
+            return self._token[key]
+        return None
+
+    def get_list(self, file_id):
         url = str(
-            apiHost[self.IS_CN]
+            self.api_host
             + "/v1.0/me/drive/root{}?expand=children($select=name,size,file,folder,parentReference,lastModifiedDateTime)"
-        ).format(parse.quote(self.drivePath(path)))
-        page = Utils.http(url, headers=self.getHeader(self.access_token))
-        r = json.loads(page.read().decode())
-        if not dl:
-            return r
-        if "@microsoft.graph.downloadUrl" in r:
-            return r["@microsoft.graph.downloadUrl"]
-        return False
+        ).format(parse.quote(self.gen_path(file_id)))
+        rep = requests.get(url=url,
+                           headers=self.gen_header(access_token=self.get_token("access")),
+                           timeout=6).json()
+        if "error" in rep:
+            print(rep["error"]["message"])
+            return []
+        return rep
+
+    def get_download_url(self, file_id):
+        rep = self.get_list(file_id=file_id)
+        return rep.get("@microsoft.graph.downloadUrl")

@@ -1,7 +1,6 @@
 import hashlib
 import re
-
-import bcrypt
+import time
 
 from altfe.interface.root import interRoot
 
@@ -41,7 +40,7 @@ class static_util(object):
         return md5.hexdigest()
 
     @staticmethod
-    def pureSize(size, dig=2, space=1):
+    def format_size(size, dig=2, space=1):
         """
         格式化文件 size。
         :param size: int: 文件大小
@@ -50,10 +49,21 @@ class static_util(object):
         :return:
         str: 格式化的 size，如 "1.23 MB"
         """
-        units = ["B", "KB", "MB", "GB", "TB", "PB"]
+        units = ["B", "KB", "MB", "GB", "TB", "PB", "EB"]
         unit_index = 0
-        K = 1024.0
-        while size >= K:
-            size = size / K
-            unit_index += 1
-        return ("%." + str(dig) + "f" + " " * space + "%s") % (size, units[unit_index])
+        k = 1024.0
+        try:
+            while size >= k:
+                size = size / k
+                unit_index += 1
+            return ("%." + str(dig) + "f" + " " * space + "%s") % (size, units[unit_index])
+        except:
+            return "Unknown"
+
+    @staticmethod
+    def format_time(date_string, format2="%Y-%m-%d %H:%M:%S"):
+        final_data = str(date_string)[:-1].split(".")[0]
+        try:
+            return time.strftime(format2, time.strptime(final_data, "%Y-%m-%dT%H:%M:%S"))
+        except:
+            return "Unknown"
