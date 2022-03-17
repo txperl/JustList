@@ -248,6 +248,7 @@
                             <input id="input-password" class="mdui-textfield-input"
                                 style="border-bottom: 1px solid rgba(0, 0, 0, .42); width: calc(100% - 95px);"
                                 type="password"
+                                autocomplete="off"
                                 @keyup.enter="get_secretList(more._u, more._f.fileId, $('#input-password').val())" />
                             <a v-on:click="get_secretList(more._u, more._f.fileId, $('#input-password').val())"
                                 class="mdui-btn mdui-btn-icon mdui-icon" style="right: 0;"><i
