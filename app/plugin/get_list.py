@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from altfe.interface.root import interRoot
 
 

@@ -18,6 +18,7 @@ class CoreOneDrive(interCloud):
     def auto(self):
         if self.conf["accounts"] is None:
             return
+        self.is_on = True
         _token = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/.token/onedrive.json", default={})
         for u in self.conf["accounts"]:
             class_one = OneDrive(is_cn=int(self.conf["accounts"][u]))
@@ -66,6 +67,8 @@ class CoreOneDrive(interCloud):
         self.STATIC.file.aout(self.getENV("rootPathFrozen") + "app/config/.token/onedrive.json", r)
 
     def load_list(self):
+        if self.is_on is False:
+            return False
         for u in self.api:
             self.inCheck = True
             tmp = []

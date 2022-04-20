@@ -20,6 +20,7 @@ class CoreCloud189(interCloud):
     def auto(self):
         if self.conf["accounts"] is None:
             return
+        self.is_on = True
         for u in self.conf["accounts"]:
             self.api[u] = cloud189.cloud189(
                 self.conf["accounts"][u][0], self.conf["accounts"][u][1]
@@ -69,6 +70,8 @@ class CoreCloud189(interCloud):
             )
 
     def load_list(self):
+        if self.is_on is False:
+            return False
         for user in self.conf["accounts"].copy():
             self.inCheck = True
             tmp = []

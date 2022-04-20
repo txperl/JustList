@@ -19,6 +19,7 @@ class CoreAliyunDrive(interCloud):
     def auto(self):
         if self.conf["accounts"] is None:
             return
+        self.is_on = True
         _token = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/.token/aliyundrive.json", default={})
         for u in self.conf["accounts"]:
             if u not in _token:
@@ -63,6 +64,8 @@ class CoreAliyunDrive(interCloud):
         self.STATIC.file.aout(self.getENV("rootPathFrozen") + "app/config/.token/aliyundrive.json", r)
 
     def load_list(self):
+        if self.is_on is False:
+            return False
         for u in self.conf["accounts"].copy():
             self.inCheck = True
             tmp = []

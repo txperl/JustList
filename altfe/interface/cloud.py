@@ -16,6 +16,7 @@ class interCloud(interRoot):
         self.dirPassword = {}
         self.lock = threading.Lock()
         self.inCheck = False
+        self.is_on = False
 
     def auto(self):
         return None

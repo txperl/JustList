@@ -21,6 +21,7 @@ class CoreLocal(interCloud):
     def auto(self):
         if self.accounts is None:
             return
+        self.is_on = True
         for user in self.accounts.copy():
             self.realID[user] = {}
             if self.accounts[user][-1] != "/":
@@ -38,6 +39,8 @@ class CoreLocal(interCloud):
             time.sleep(self.conf["sys_dataExpiredTime"])
 
     def load_list(self):
+        if self.is_on is False:
+            return False
         for u in self.accounts:
             self.inCheck = True
             try:

@@ -1,5 +1,3 @@
-# coding=utf-8
-
 from flask import redirect
 
 from altfe.interface.root import interRoot
