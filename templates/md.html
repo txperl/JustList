@@ -10,8 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="same-origin">
     <title>JustList</title>
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mdui@1.0.1/dist/css/mdui.min.css">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.css">
+    <link rel="stylesheet" href="//lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/mdui/1.0.2/css/mdui.min.css">
+    <link rel="stylesheet" href="//lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/viewerjs/1.5.0/viewer.min.css">
     <style>
         .mdui-typo img {
             width: auto;
@@ -50,6 +50,10 @@
             box-shadow: none;
         }
 
+        .mdui-list {
+            padding: 0;
+        }
+
         .mdui-list-item,
         .mdui-list-item:hover {
             border-radius: 20px;
@@ -75,10 +79,6 @@
             box-shadow: none;
         }
 
-        .mdui-appbar-with-toolbar {
-            padding: 56px 0;
-        }
-
         .ani-spin {
             animation: mdui-spinner 1568ms linear infinite;
         }
@@ -98,21 +98,10 @@
             transform: translateY(-50%) translateX(-50%);
             z-index: 999;
         }
-
-        @media (min-width: 600px) {
-            #file-list {
-                margin-top: 20px;
-                margin-bottom: 30px;
-            }
-
-            .mdui-appbar-with-toolbar {
-                padding: 64px 0;
-            }
-        }
     </style>
 </head>
 
-<body class="mdui-appbar-with-toolbar">
+<body>
     <div id="loading">
         <img src="data:image/svg+xml;base64,PCEtLSBCeSBTYW0gSGVyYmVydCAoQHNoZXJiKSwgZm9yIGV2ZXJ5b25lLiBNb3JlIEAgaHR0cDovL2dvby5nbC83QUp6YkwgLS0+Cjxzdmcgd2lkdGg9IjE0MCIgaGVpZ2h0PSI2NCIgdmlld0JveD0iMCAwIDE0MCA2NCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJwaW5rIj4KICAgIDxwYXRoIGQ9Ik0zMC4yNjIgNTcuMDJMNy4xOTUgNDAuNzIzYy01Ljg0LTMuOTc2LTcuNTYtMTIuMDYtMy44NDItMTguMDYzIDMuNzE1LTYgMTEuNDY3LTcuNjUgMTcuMzA2LTMuNjhsNC41MiAzLjc2IDIuNi01LjI3NGMzLjcxNy02LjAwMiAxMS40Ny03LjY1IDE3LjMwNS0zLjY4IDUuODQgMy45NyA3LjU2IDEyLjA1NCAzLjg0MiAxOC4wNjJMMzQuNDkgNTYuMTE4Yy0uODk3IDEuNTEyLTIuNzkzIDEuOTE1LTQuMjI4Ljl6IiBmaWxsLW9wYWNpdHk9Ii41Ij4KICAgICAgICA8YW5pbWF0ZSBhdHRyaWJ1dGVOYW1lPSJmaWxsLW9wYWNpdHkiCiAgICAgICAgICAgICBiZWdpbj0iMHMiIGR1cj0iMS40cyIKICAgICAgICAgICAgIHZhbHVlcz0iMC41OzE7MC41IgogICAgICAgICAgICAgY2FsY01vZGU9ImxpbmVhciIKICAgICAgICAgICAgIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIiAvPgogICAgPC9wYXRoPgogICAgPHBhdGggZD0iTTEwNS41MTIgNTYuMTJsLTE0LjQ0LTI0LjI3MmMtMy43MTYtNi4wMDgtMS45OTYtMTQuMDkzIDMuODQzLTE4LjA2MiA1LjgzNS0zLjk3IDEzLjU4OC0yLjMyMiAxNy4zMDYgMy42OGwyLjYgNS4yNzQgNC41Mi0zLjc2YzUuODQtMy45NyAxMy41OTItMi4zMiAxNy4zMDcgMy42OCAzLjcxOCA2LjAwMyAxLjk5OCAxNC4wODgtMy44NDIgMTguMDY0TDEwOS43NCA1Ny4wMmMtMS40MzQgMS4wMTQtMy4zMy42MS00LjIyOC0uOXoiIGZpbGwtb3BhY2l0eT0iLjUiPgogICAgICAgIDxhbmltYXRlIGF0dHJpYnV0ZU5hbWU9ImZpbGwtb3BhY2l0eSIKICAgICAgICAgICAgIGJlZ2luPSIwLjdzIiBkdXI9IjEuNHMiCiAgICAgICAgICAgICB2YWx1ZXM9IjAuNTsxOzAuNSIKICAgICAgICAgICAgIGNhbGNNb2RlPSJsaW5lYXIiCiAgICAgICAgICAgICByZXBlYXRDb3VudD0iaW5kZWZpbml0ZSIgLz4KICAgIDwvcGF0aD4KICAgIDxwYXRoIGQ9Ik02Ny40MDggNTcuODM0bC0yMy4wMS0yNC45OGMtNS44NjQtNi4xNS01Ljg2NC0xNi4xMDggMC0yMi4yNDggNS44Ni02LjE0IDE1LjM3LTYuMTQgMjEuMjM0IDBMNzAgMTYuMTY4bDQuMzY4LTUuNTYyYzUuODYzLTYuMTQgMTUuMzc1LTYuMTQgMjEuMjM1IDAgNS44NjMgNi4xNCA1Ljg2MyAxNi4wOTggMCAyMi4yNDdsLTIzLjAwNyAyNC45OGMtMS40MyAxLjU1Ni0zLjc1NyAxLjU1Ni01LjE4OCAweiIgLz4KPC9zdmc+Cg=="
             alt="loading" />
@@ -123,7 +112,7 @@
                 <!-- 卡片的内容 -->
                 <div class="mdui-card-content">
                     <!-- 头 -->
-                    <div style="padding: 8px 5px 12px 5px;">
+                    <div style="margin: 5em 0 1em 0;">
                         <!-- 用户选择菜单 -->
                         <ul class="mdui-menu" id="choose_user" style="max-height: 100%;">
                             <li v-for="x in more.users" class="mdui-menu-item">
@@ -169,7 +158,7 @@
 
                     <ul class="mdui-list">
                         <!-- 功能按键 -->
-                        <li class="mdui-list-item">
+                        <li class="mdui-list-item" style="padding: 0 10px;">
                             <div class="mdui-list-item-content">
                                 <div class="mdui-list-item-title">
                                     <!-- 搜索 -->
@@ -311,16 +300,16 @@
 </body>
 
 <footer>
-    <script src="//cdn.jsdelivr.net/npm/mdui@1.0.1/dist/js/mdui.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/localforage@1.9.0/dist/localforage.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/vue@2.6.11/dist/vue.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/axios@0.19.2/dist/axios.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/vue-markdown@2.2.4/dist/vue-markdown.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/vue-lazyload@1.3.3/vue-lazyload.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/viewerjs@1.5.0/dist/viewer.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/v-viewer@1.5.1/dist/v-viewer.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+    <script src="//lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/mdui/1.0.2/js/mdui.min.js"></script>
+    <script src="//lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/3.5.1/jquery.min.js"></script>
+    <script src="//lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/localforage/1.9.0/localforage.min.js"></script>
+    <script src="//lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue/2.6.11/vue.min.js"></script>
+    <script src="//lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/axios/0.19.2/axios.min.js"></script>
+    <script src="//lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue-markdown/2.2.4/vue-markdown.min.js"></script>
+    <script src="//lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/vue-lazyload/1.3.3/vue-lazyload.js"></script>
+    <script src="//lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/viewerjs/1.5.0/viewer.min.js"></script>
+    <script src="//lf6-cdn-tos.bytecdntp.com/cdn/expire-1-M/bcryptjs/2.4.3/bcrypt.min.js"></script>
+    <script src="//github.elemecdn.com/v-viewer/dist/v-viewer.js"></script>
     <script>
         tmp = {}; // 全局暂留
 
@@ -587,22 +576,18 @@
                     }
                 },
                 sort_array: function (arr) {
-                    function func(a, b) {
-                        if (a.isFolder || b.isFolder) return b.isFolder - a.isFolder;
-                        const x1 = a.fileName;
-                        const x2 = b.fileName;
-                        if (x1 < x2) return -1;
-                        if (x1 > x2) return 1;
-                        return 0;
-                    }
-                    let r = {};
                     try {
-                        r = arr.slice().sort(func);
+                        return [...arr].sort((a, b) => {
+                            if (a.isFolder && !b.isFolder) return -1;
+                            if (!a.isFolder && b.isFolder) return 1;
+                            if (a.fileName < b.fileName) return -1;
+                            if (a.fileName > b.fileName) return 1;
+                            return 0;
+                        });
                     } catch (e) {
                         console.log(e);
-                        r = { "Error": [] };
                     }
-                    return r;
+                    return arr;
                 },
                 toPath: function (path) {
                     let may, type;

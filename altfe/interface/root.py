@@ -83,7 +83,7 @@ class classRoot(object):
 
     @staticmethod
     def loadConfig(uri, default=False):
-        if not os.path.exists(uri) or ("/.token/" in uri and (time.time() - os.path.getmtime(uri) > 3600 * 24 * 3)):
+        if not os.path.exists(uri):
             return default
         with open(uri, "r", encoding="UTF-8") as f:
             try:
