@@ -202,20 +202,33 @@ class cloud189(object):
         return r
 
     def get_file_info(self, fileid, dl=False):
-        try:
-            r = self.session.get(
-                "https://cloud.189.cn/api/open/file/getFileDownloadUrl.action",
-                params={
-                    "fileId": fileid,
-                    "noCache": 0
-                },
-                headers={"Accept": "application/json;charset=UTF-8"},
-                timeout=6
-            ).json()
-        except:
-            return False
-        if not dl:
+        r_v1 = self.get_file_info_v1(fileid, dl)
+        if r_v1 is False:
+            return self.get_file_info_v2(fileid, dl)
+        return r_v1
+
+    def get_file_info_v1(self, fid, dl=True):
+        r = self.session.get(
+            "https://cloud.189.cn/api/open/file/getFileDownloadUrl.action",
+            params={"fileId": fid, "noCache": 0},
+            headers={"Accept": "application/json;charset=UTF-8"},
+            timeout=6
+        ).json()
+        if dl is False:
             return r
-        if "fileDownloadUrl" in r:
-            return r["fileDownloadUrl"]
+        return r.get("fileDownloadUrl", False)
+
+    def get_file_info_v2(self, fid, dl=True):
+        r = self.session.get(
+            "https://cloud.189.cn/v2/getFileInfo.action",
+            params={"fileId": fid, "noCache": 0},
+            headers={"Accept": "application/json;charset=UTF-8"},
+            timeout=6
+        ).json()
+        if dl is False:
+            return r
+        download_url = "https:" + r.get("downloadUrl", False)
+        if download_url is not False:
+            final_url = self.session.get(download_url, allow_redirects=False, timeout=6).headers["Location"]
+            return final_url.replace("http://", "https://")
         return False
