@@ -81,13 +81,11 @@ class CoreCloud189(interCloud):
             except Exception as e:
                 self.STATIC.localMsger.error(e)
             else:
-                self.lock.acquire()
                 self.dirPassword[user] = psws
                 self.list[user] = tuple(tmp)
-                self.lock.release()
+                self.listOutdated = time.time() + self.conf["sys_dataExpiredTime"]
                 print(f"[Cloud189] {user} list updated at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             self.inCheck = False
-        self.listOutdated = time.time() + self.conf["sys_dataExpiredTime"]
         return True
 
     def __proLoad_list(self, user=None, arr=[], fileId=-11, struri="", rootIndex=0):

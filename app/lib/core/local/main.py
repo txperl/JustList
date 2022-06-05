@@ -49,13 +49,11 @@ class CoreLocal(interCloud):
             except Exception as e:
                 self.STATIC.localMsger.error(e)
             else:
-                self.lock.acquire()
                 self.dirPassword[u] = psws
                 self.list[u] = tuple(tmp)
-                self.lock.release()
+                self.listOutdated = time.time() + self.conf["sys_dataExpiredTime"]
                 print(f"[Local] {u} list updated at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
             self.inCheck = False
-        self.listOutdated = time.time() + self.conf["sys_dataExpiredTime"]
         return True
 
     def __proLoad_list(self, user, path):
