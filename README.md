@@ -8,72 +8,59 @@
 
 ## 功能
 
-* 多网盘支持
+* 支持不同网盘
   + 天翼云盘
   + 阿里云盘
-  + OneDrive、OneDrive 世纪互联
-  + 本地目录索引
-* 可同时启用多个网盘的多个用户
-* 可设置文件夹密码，即私密目录
-* 请求预处理机制，包含 rate limit、referrer 验证等
+  + OneDrive & 世纪互联
+  + 本地文件
+* 支持多个网盘的多用户使用
+* 支持文件夹密码保护
+* 简单的请求预处理机制
 
-## 部署
+## 使用
 
-您可以使用 **Docker** 进行部署，具体可以参考 [docker-hub@txperl/justlist](https://hub.docker.com/r/txperl/justlist)。
+### Docker
+
+- [Docker Hub](https://hub.docker.com/r/txperl/justlist)
+
+### 手动部署
+
+- [部署演示视频](https://www.bilibili.com/video/BV15V4y1J7b4/) by [hcllmsx](https://github.com/hcllmsx)
 
 本程序支持前后端分离，以下主要为后端部署说明。
 
 总的来说，很简单的几步：安装依赖、修改配置、运行。
 
-### 1. 安装依赖
+#### 1. 安装依赖
 
 ``` bash
 # Python 3.7(+)
 $ pip install -r requirements.txt
 ```
 
-### 2. 修改配置
+#### 2. 修改配置
 
 所有配置文件都位于 `./app/config/` 文件夹中，如下：
 
-- local：本地目录配置项
-- cloud189：天翼云盘配置
-- aliyundrive：阿里云盘配置
-- onedrive：OneDrive 配置
-- switch：插件开关与预处理相关配置
+- local: 本地目录配置项
+- cloud189: 天翼云盘配置
+- aliyundrive: 阿里云盘配置
+- onedrive: OneDrive 配置
+- switch: 插件开关与预处理相关配置
 
-**若要启用某个网盘，必须修改的是账号配置**，如下：
+若要启用某个网盘，必须修改的是账号配置，它们位于各网盘配置文件头部的 `accounts` 字段。例如：
 
 ``` yaml
-# 本地目录配置项，下列字段位于 ./app/config/local.yml
-accounts:
-  Local_A: "<path_a>"
-  Local_B: "<path_b>"
-
-# 天翼云盘，下列字段位于 ./app/config/cloud189.yml
-accounts:
-  Cloud189_User1:
-    - "<your_username>"
-    - "<your_password>"
-  Cloud189_User2:
-    - "<your_username>"
-    - "<your_password>"
-
-# 阿里云盘，下列字段位于 ./app/config/aliyundrive.yml
-# 程序启动时会引导您手动获取 Refresh Token
-accounts:
-  - "AliyunDrive_A"
-  - "AliyunDrive_B"
-
 # OneDrive，下列字段位于 ./app/config/onedrive.yml
-# 程序启动时会引导您手动获取 Refresh Token
 # 0 为国际版，1 为世纪互联版
 accounts:
   OneDrive_INTL: 0
   OneDrive_CN: 1
 ```
 
-### 3. 启动程序
+需要注意的是，**部分网盘在启动时程序会引导您手动获取登录信息**。
+
+#### 3. 启动程序
 
 ``` bash
 $ python main.py
@@ -111,7 +98,7 @@ $ python main.py
 1. 编辑 `./main.py` ，将 `CORS(app, resources=r"/*")` 取消注释
 2. 编辑 `./templates/md.html` ，将 `api_url` 改为后端运行地址即可（结尾不含 `/` ）
 
-### md 主题的默认显示用户
+### 默认显示用户
 
 若要自定义前端 `md` 主题的默认显示用户，即默认显示的网盘文件列表，需进行如下操作。
 
@@ -141,8 +128,8 @@ $ python main.py
 ├── ├── ├── ins                       # 通用实例类
 ├── ├── ├── static                    # 静态类
 ├── ├── pre                         # 预处理模块，当收到请求后但在插件实例化前执行
-├── ├── ├── rate_limit.py             # rate limit 代码
-├── ├── ├── verify_referrer.py        # referrer 验证代码
+├── ├── ├── rate_limit.py             # Rate Limit 代码
+├── ├── ├── verify_referrer.py        # Rreferrer 验证代码
 ├── ├── plugin                      # 插件模块，当收到请求后会被实例化并执行
 ├── ├── ├── do_file.py                # 直链跳转
 ├── ├── ├── get_list.py               # 目录获取
@@ -159,7 +146,7 @@ $ python main.py
 1. **目录获取**
   + `[POST] api/get/list/`
   + `api/get/list/` : 返回全部目录
-  + `api/get/list/user1/` : 返回 user 1 的全部目录
+  + `api/get/list/user1/` : 返回 user1 的全部目录
   + `api/get/list/user2/a/b/` : 返回 user2 的 a 目录下的 b 目录/文件（如果存在）
       + `# application/json; charset=utf-8`
       + `password` : 目录密码（可选）
@@ -169,17 +156,17 @@ $ python main.py
       + `password` : 目录密码（可选）
 
 2. **文件下载**
-
   + `[GET] file/`
   + `file/user1/a/b/` : 返回 user1 的 a 目录下的 b 文件地址（如果存在）
   + `file/user2/?id=xxx` : 返回 user2 的 id 为 xxx 的文件地址
   + `file/user3/?id=xxx&password=psw` : 返回 user3 的 id 为 xxx 的文件地址，且访问密码为 psw
 
-3. `强制刷新目录缓存@[GET] sys/update/xxxiiixxx/`
+3. **强制刷新目录缓存**
+  + `[GET] sys/update/xxxiiixxx/`
 
 ## 说明
 
-* 本程序会一次性加载全部允许的文件并缓存，所以若文件较多此过程可能会较慢（取决于你文件的数量与网络状况），但不影响正常运行
+* 本程序会一次性加载全部允许的文件并缓存，所以若文件较多此过程可能会较慢（取决于文件的数量与网络状况），但不影响正常运行
 * 仅在小规模（天翼云盘x2、OneDrive 国际版x1、世纪互联版x1）且请求、文件数量中等的情况下测试，服务可用率约为 99%
 * 网盘操作代码参考自 [Aruelius/cloud189](https://github.com/Aruelius/cloud189)、[MoeClub/OneList](https://github.com/MoeClub/OneList)，感谢
 
