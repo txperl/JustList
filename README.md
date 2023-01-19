@@ -93,11 +93,6 @@ $ python main.py
 
 私密文件夹下的所有文件也都是私密的，需要密码才可访问与下载。
 
-### 前后端分离
-
-1. 编辑 `./main.py` ，将 `CORS(app, resources=r"/*")` 取消注释
-2. 编辑 `./templates/md.html` ，将 `api_url` 改为后端运行地址即可（结尾不含 `/` ）
-
 ### 默认显示用户
 
 若要自定义前端 `md` 主题的默认显示用户，即默认显示的网盘文件列表，需进行如下操作。
@@ -167,7 +162,6 @@ $ python main.py
 ## 说明
 
 * 本程序会一次性加载全部允许的文件并缓存，所以若文件较多此过程可能会较慢（取决于文件的数量与网络状况），但不影响正常运行
-* 仅在小规模（天翼云盘x2、OneDrive 国际版x1、世纪互联版x1）且请求、文件数量中等的情况下测试，服务可用率约为 99%
 * 网盘操作代码参考自 [Aruelius/cloud189](https://github.com/Aruelius/cloud189)、[MoeClub/OneList](https://github.com/MoeClub/OneList)，感谢
 
 ## 声明
