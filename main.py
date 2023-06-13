@@ -42,7 +42,7 @@ def run(path):
         return rep
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Altfe 框架初始化
     classRoot.setENV("rootPath", rootPath)
     classRoot.setENV("rootPathFrozen", rootPathFrozen)

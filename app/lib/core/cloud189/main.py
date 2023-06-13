@@ -11,7 +11,10 @@ class CoreCloud189(interCloud):
     def __init__(self):
         super().__init__()
         self.conf = self.INS.conf.dict("cloud189")
-        self.token = self.loadConfig(self.getENV("rootPathFrozen") + "app/config/.token/cloud189.json", default={})
+        self.token = self.loadConfig(
+            self.getENV("rootPathFrozen") + "app/config/.token/cloud189.json",
+            default={},
+        )
         self.listOutdated = 0
         self.api = {}
         self.rootPath = [x for x in self.conf["rootPath"].split("/") if x != ""]
@@ -25,15 +28,19 @@ class CoreCloud189(interCloud):
             self.api[u] = cloud189.cloud189(
                 self.conf["accounts"][u][0], self.conf["accounts"][u][1]
             )
-            tok = self.token[u] if u in self.token else None
-            self.token[u] = self.api[u].login(tok)
-            self.token[u]["outdated"] = (
+            token = self.token[u] if u in self.token else {}
+            cookie = self.api[u].login(token)
+            if type(cookie) is not dict:
+                continue
+            cookie["outdated"] = (
                 (time.time() + self.conf["sys_tokenExpiredTime"])
-                if "outdated" not in self.token[u]
-                else self.token[u]["outdated"]
+                if "outdated" not in token
+                else token["outdated"]
             )
+            self.token[u] = cookie
         self.STATIC.file.aout(
-            self.getENV("rootPathFrozen") + "app/config/.token/cloud189.json", self.token,
+            self.getENV("rootPathFrozen") + "app/config/.token/cloud189.json",
+            self.token,
         )
         t = threading.Timer(0, self.__childth_check)
         t.setDaemon(True)
@@ -52,7 +59,7 @@ class CoreCloud189(interCloud):
 
     def __update_token(self, tim):
         isUp = False
-        for u in self.conf["accounts"]:
+        for u in self.token:
             if tim > self.token[u]["outdated"]:
                 try:
                     tmp = self.api[u].login(self.token[u])
@@ -66,7 +73,8 @@ class CoreCloud189(interCloud):
                     isUp = True
         if isUp:
             self.STATIC.file.aout(
-                self.getENV("rootPathFrozen") + "app/config/.token/cloud189.json", self.token,
+                self.getENV("rootPathFrozen") + "app/config/.token/cloud189.json",
+                self.token,
             )
 
     def load_list(self):
@@ -84,7 +92,10 @@ class CoreCloud189(interCloud):
                 self.dirPassword[user] = psws
                 self.list[user] = tuple(tmp)
                 self.listOutdated = time.time() + self.conf["sys_dataExpiredTime"]
-                print(f"[Cloud189] {user} list updated at " + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+                print(
+                    f"[Cloud189] {user} list updated at "
+                    + time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+                )
             self.inCheck = False
         return True
 
@@ -97,7 +108,11 @@ class CoreCloud189(interCloud):
                 isStart = False
                 if file["isFolder"] and file["fileName"] == self.rootPath[rootIndex]:
                     self.__proLoad_list(
-                        user, arr, file["fileId"], struri + file["fileName"] + "/", rootIndex + 1
+                        user,
+                        arr,
+                        file["fileId"],
+                        struri + file["fileName"] + "/",
+                        rootIndex + 1,
                     )
                 continue
         if not isStart:
@@ -105,7 +120,9 @@ class CoreCloud189(interCloud):
         status = []
         for file in data:
             # 过滤排除的文件夹/文件
-            if self.STATIC.util.isNeedLoad(file["isFolder"], str(file["fileName"]), self.conf):
+            if self.STATIC.util.isNeedLoad(
+                file["isFolder"], str(file["fileName"]), self.conf
+            ):
                 continue
             # 项
             item = {
@@ -121,14 +138,24 @@ class CoreCloud189(interCloud):
                 "child": [],
                 "user": user,
                 "isSecret": False,
-                "driveName": "cloud189"
+                "driveName": "cloud189",
             }
             if not file["isFolder"]:
                 item["fileSize"] = self.api[user].get_file_size_str(file["fileSize"])
                 item["fileType"] = file["fileType"]
             else:
-                status.append(self.COMMON.thread.plz().submit(self.__proLoad_list, *(
-                    user, item["child"], file["fileId"], struri + file["fileName"] + "/", rootIndex + 1)))
+                status.append(
+                    self.COMMON.thread.plz().submit(
+                        self.__proLoad_list,
+                        *(
+                            user,
+                            item["child"],
+                            file["fileId"],
+                            struri + file["fileName"] + "/",
+                            rootIndex + 1,
+                        ),
+                    )
+                )
             arr.append(item)
         # 阻塞多线程获取文件夹内容
         for x in as_completed(status):
